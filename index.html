@@ -280,44 +280,11 @@
 <h6 style="color:#FF4500;">Published By R41H4N ❤️</h6>
 <br>
 
-	<-- counter -->
-		<head>
-  <title>Website Counter</title>
-  <script defer src="index.js"></script>
-  <link rel="stylesheet" href="styles.css" />
-</head>
 
-<body>
-  <div>Website visit count:</div>
-  <div class="website-counter"></div>
-  <!--<button id="reset">Reset</button>-->
-</body>
-		<--end-->
 <!-- partial -->
   <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js'></script>
 
-<script 
-			var counterContainer = document.querySelector(".website-counter");
-var resetButton = document.querySelector("#reset");
-var visitCount = localStorage.getItem("page_view");
-
-// Check if page_view entry is present
-if (visitCount) {
-  visitCount = Number(visitCount) + 1;
-  localStorage.setItem("page_view", visitCount);
-} else {
-  visitCount = 1;
-  localStorage.setItem("page_view", 1);
-}
-counterContainer.innerHTML = visitCount;
-
-// Adding onClick event listener
-resetButton.addEventListener("click", () => {
-  visitCount = 1;
-  localStorage.setItem("page_view", 1);
-  counterContainer.innerHTML = visitCount;
-});
-</script>
+	  
 <script>
 	
 	function killCopy(e){
@@ -395,47 +362,6 @@ document.onclick=reEnable
   .card {
     font-size: 0.9em;
   }
-}
 
-
-
-	/* counter *\
-
-	/* Center child elements */
-body,
-.website-counter {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-body {
-  height: 100vh;
-}
-
-/* Styles for website counter container */
-.website-counter {
-  height: 50px;
-  width: 80px;
-  color: white;
-  border-radius: 30px;
-  font-weight: 700;
-  font-size: 25px;
-  margin-top: 10px;
-}
-
-/* Styles for reset button */
-#reset {
-  margin-top: 20px;
-  background-color: #008cba;
-
-  cursor: pointer;
-  font-size: 18px;
-  padding: 8px 20px;
-  color: white;
-  border: 0;
-}
-	/*  end *\
 </style>
 </html>
