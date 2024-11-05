@@ -277,6 +277,83 @@
 	document.write(`&copy Copyright ${new Date().getFullYear()} - ${location.host}. All Rights Reserved.`);
 </script>
 <h6 style="color:gray"> Price Last Update on = 01/11/2024</h6>
+
+	<!-----website visitors count --->
+	<body>
+<head>
+  <script defer src="index.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <h5 style="color:#4CBB17;">Website visitors count:</h5>
+  <div class="website-counter"></div><br>
+  <!--<button id="reset">Reset</button>-->
+</body>
+</body>
+<style>
+  
+  /* Center child elements */
+body,
+.website-counter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+body {
+  height: 100vh;
+}
+
+/* Styles for website counter container */
+.website-counter {
+  background-color: #ff4957;
+  height: 50px;
+  width: 80px;
+  color: white;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 25px;
+  margin-top: 10px;
+}
+
+/* Styles for reset button */
+#reset {
+  margin-top: 20px;
+  background-color: #008cba;
+
+  cursor: pointer;
+  font-size: 18px;
+  padding: 8px 20px;
+  color: white;
+  border: 0;
+}
+</style>
+<script >
+  var counterContainer = document.querySelector(".website-counter");
+var resetButton = document.querySelector("#reset");
+var visitCount = localStorage.getItem("page_view");
+
+// Check if page_view entry is present
+if (visitCount) {
+  visitCount = Number(visitCount) + 1;
+  localStorage.setItem("page_view", visitCount);
+} else {
+  visitCount = 1;
+  localStorage.setItem("page_view", 1);
+}
+counterContainer.innerHTML = visitCount;
+
+// Adding onClick event listener
+resetButton.addEventListener("click", () => {
+  visitCount = 1;
+  localStorage.setItem("page_view", 1);
+  counterContainer.innerHTML = visitCount;
+});
+</script>
+
+<!-----website Vistor Counter --->
 <h6 style="color:#FF4500;">Published By R41H4N ❤️</h6>
 <br>
 
