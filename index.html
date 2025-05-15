@@ -287,6 +287,86 @@ s0.parentNode.insertBefore(s1,s0);
 <h5 align="center">- আমাদের পেমেন্ট মাধ্যম বিকাশ এবং নগদ পার্সোনাল সেন্ড মানি! আমাদের সকল সার্ভিস স্বয়ক্রিয় ভাবে করা হয় যার ফলে আমরা সাধারণত কাজের আগে ৫০% পেমেন্ট নিয়ে থাকি এবং কাজ সম্পূর্ণ হওয়ার পরে বাকি পেমেন্ট গহন করি।</p>
     </div><br>
 
+	
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .counter-box {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .counter {
+      font-size: 48px;
+      color: #007BFF;
+      font-weight: bold;
+      margin: 10px 0;
+      transition: all 0.3s ease;
+    }
+
+    .label {
+      font-size: 18px;
+      color: #444;
+    }
+
+    @keyframes fadeInUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="counter-box">
+    <div class="counter" id="orders">0</div>
+    <div class="label">Total Completed Orders</div>
+    <br>
+    <div class="counter" id="clients">0</div>
+    <div class="label">Happy Clients</div>
+  </div>
+
+  <script>
+    // Configuration
+    const startDate = new Date("2024-01-01");
+    const now = new Date();
+    const dayDiff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+
+    const orders = dayDiff * 4; // 4 orders/day
+    const clients = dayDiff * 3; // 3 clients/day
+
+    function animateCounter(id, endValue) {
+      let current = 0;
+      const duration = 1500;
+      const step = Math.ceil(endValue / (duration / 20));
+      const el = document.getElementById(id);
+
+      const interval = setInterval(() => {
+        current += step;
+        if (current >= endValue) {
+          current = endValue;
+          clearInterval(interval);
+        }
+        el.textContent = current.toLocaleString();
+      }, 20);
+    }
+
+    animateCounter("orders", orders);
+    animateCounter("clients", clients);
+  </script>
+</body>
+</html>
+
 
 <script>
 	document.write(`&copy Copyright ${new Date().getFullYear()} - ${location.host}. All Rights Reserved.`);
