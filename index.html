@@ -316,10 +316,10 @@
 <body>
   <div class="counter-box">
     <div class="counter" id="orders">0</div>
-    <div class="label">Total Completed Orders</div>
+    <div class="label">Average Total Completed Orders</div>
     <br>
     <div class="counter" id="clients">0</div>
-    <div class="label">Happy Clients</div>
+    <div class="label">Average Happy Clients</div>
   </div>
 
   <script>
@@ -328,8 +328,8 @@
     const now = new Date();
     const dayDiff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
 
-    const orders = dayDiff * 6; // 4 orders/day
-    const clients = dayDiff * 5; // 3 clients/day
+    const orders = dayDiff * 9; // 4 orders/day
+    const clients = dayDiff * 8; // 3 clients/day
 
     function animateCounter(id, endValue) {
       let current = 0;
