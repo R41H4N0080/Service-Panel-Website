@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+ <meta charset="UTF-8">
+ <title>অটোমেটিক অর্ডার</title>
+ <style>
+ body {
+ font-family: 'Segoe UI', sans-serif;
+ background: linear-gradient(145deg, #e0e0e0, #ffffff);
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ padding: 20px;
+ min-height: 100vh;
+ }
+ .form-container {
+ background: #f9f9f9;
+ border-radius: 20px;
+ padding: 30px;
+ width: 100%;
+ max-width: 500px;
+ box-shadow: 10px 10px 30px #bebebe, -10px -10px 30px #ffffff;
+ }
+ label, h2 {
+ display: block;
+ margin-top: 10px;
+ }
+ input, select, textarea, button {
+ width: 100%;
+ padding: 10px;
+ margin-top: 5px;
+ border-radius: 10px;
+ border: 1px solid #ccc;
+ font-size: 14px;
+ }
+ button {
+ background-color: #6c63ff;
+ color: white;
+ border: none;
+ margin-top: 15px;
+ }
+ .message {
+ margin-top: 10px;
+ padding: 10px;
+ text-align: center;
+ border-radius: 10px;
+ }
+ .success-message { background: #d4edda; color: #155724; }
+ .error-message { background: #f8d7da; color: #721c24; }
+ .hidden { display: none; }
+ </style>
+</head>
+<body>
+<div class="form-container">
+ <h2>সোশ্যাল মিডিয়া অর্ডার</h2>
+ <form id="orderForm" action="https://api.web3forms.com/submit" method="POST">
+ <input type="hidden" name="access_key" value="4d4859bd-a331-4d77-98ca-97c6b8275b3f">
+ <!--Key-->
+ <input type="hidden" name="order_id" id="order_id">
+
+ <label>নাম্বার :</label>
+ <input type="email#" id="email" required>
+ <button type="button" id="sendOtp">OTP পাঠান</button>
+
+ <div id="otpSection" class="hidden">
+ <input type="text" id="otpInput" placeholder="OTP দিন">
+ <button type="button" id="verifyOtp">OTP ভেরিফাই</button>
+ <div id="otpMsg" class="message"></div>
+ </div>
+
+ <div id="mainFields" class="hidden">
+ <label>নাম:</label>
+ <input type="text" name="name" required>
+
+ <label>ক্যাটাগরি:</label>
+ <select id="category" required>
+ <option value="" disabled selected>-- নির্বাচন করুন --</option>
+ <option value="facebook">Facebook</option>
+ <option value="instagram">Instagram</option>
+ <option value="tiktok">TikTok</option>
+ <option value="graphics">Graphics</option>
+ </select>
+
+ <label>সার্ভিস:</label>
+ <select name="service" id="service" required></select>
+ <div id="limitNote"></div>
+
+ <label>Target লিংক:</label>
+ <input type="url" name="link" required>
+
+ <label>পরিমাণ:</label>
+ <input type="number" name="quantity" id="qty" required>
+
+ <label>মোট এমাউন্ট:</label>
+ <input type="text" id="totalPrice" readonly>
+
+ <label>পেমেন্ট পদ্ধতি:</label>
+ <select id="paymentMethod" name="payment" required>
+ <option value="bkash">বিকাশ</option>
+ <option value="nagad">নগদ</option>
+ </select>
+
+ <div id="paymentInfo"></div>
+
+ <label>TrxID:</label>
+ <input type="text" name="trxid" required>
+
+ <label>মন্তব্য (ঐচ্ছিক):</label>
+ <textarea name="note" rows="3"></textarea>
+
+ <button type="submit">অর্ডার সাবমিট করুন</button>
+ <div id="successMsg" class="success-message hidden">✅ সফলভাবে অর্ডার সাবমিট হয়েছে!</div>
+ <div id="errorMsg" class="error-message hidden">❌ সমস্যা হয়েছে, আবার চেষ্টা করুন।</div>
+ </div>
+ </form>
+</div>
+
+<script>
+ const categoryData = {
+ facebook: [
+ { name: "Page bot mix followers", min: 100, max: 10000, price: 150 },
+ { name: "Post Bd 🇧🇩 react ", min: 50, max: 5000, price: 200 }, { name: "Post BD 🇧🇩 custom comment ", min: 20, max: 1000, price: 1050 }, { name: "Page BD 🇧🇩 Custom review", min: 5, max: 50, price: 10000 }
+ ],
+ instagram: [
+ { name: "Bangladeshi 🇧🇩 mix real Followers vip ", min: 100, max: 10000, price: 180 },
+ { name: "Post Likes bd 🇧🇩 ", min: 50, max: 5000, price: 120 }
+ ],
+ tiktok: [
+ { name: "Followers bot mix ", min: 100, max: 15000, price: 170 },
+ { name: "Video Views", min: 1000, max: 50000000000, price: 1 }, { name: "Video VIP viral package" , min: 1, max: 10, price: 100000 }
+ ],
+ graphics: [
+ { name: "Logo Design", min: 1, max: 100, price: 10000 },
+ { name: "Banner Design", min: 1, max: 100, price: 50000 }
+ ]
+ };
+
+ let generatedOtp = "";
+ const email = document.getElementById('email');
+ const sendOtp = document.getElementById('sendOtp');
+ const otpInput = document.getElementById('otpInput');
+ const verifyOtp = document.getElementById('verifyOtp');
+ const otpMsg = document.getElementById('otpMsg');
+ const otpSection = document.getElementById('otpSection');
+ const mainFields = document.getElementById('mainFields');
+
+ const category = document.getElementById('category');
+ const service = document.getElementById('service');
+ const qty = document.getElementById('qty');
+ const limitNote = document.getElementById('limitNote');
+ const totalPrice = document.getElementById('totalPrice');
+ const paymentMethod = document.getElementById('paymentMethod');
+ const paymentInfo = document.getElementById('paymentInfo');
+
+ sendOtp.onclick = () => {
+ if (!email.value) return alert("ইমেইল দিন");
+ generatedOtp = (Math.floor(Math.random() * 90) + 10).toString();
+ alert("আপনার OTP: " + generatedOtp);
+ otpSection.classList.remove('hidden');
+ };
+
+ verifyOtp.onclick = () => {
+ if (otpInput.value === generatedOtp) {
+ otpMsg.textContent = "OTP সঠিক!";
+ otpMsg.className = "message success-message";
+ mainFields.classList.remove('hidden');
+ } else {
+ otpMsg.textContent = "ভুল OTP!";
+ otpMsg.className = "message error-message";
+ }
+ };
+
+ category.onchange = () => {
+ const selected = category.value;
+ service.innerHTML = "";
+ categoryData[selected].forEach(srv => {
+ const option = document.createElement("option");
+ option.value = srv.name;
+ option.textContent = srv.name;
+ option.setAttribute("data-min", srv.min);
+ option.setAttribute("data-max", srv.max);
+ option.setAttribute("data-price", srv.price);
+ service.appendChild(option);
+ });
+ service.dispatchEvent(new Event("change"));
+ };
+
+ function updatePrice() {
+ const selectedOption = service.options[service.selectedIndex];
+ const min = parseInt(selectedOption.getAttribute("data-min"));
+ const max = parseInt(selectedOption.getAttribute("data-max"));
+ const price = parseInt(selectedOption.getAttribute("data-price"));
+
+ qty.min = min;
+ qty.max = max;
+ if (qty.value < min) qty.value = min;
+
+ limitNote.textContent = `সর্বনিম্ন ${min} এবং সর্বোচ্চ ${max} অর্ডার করা যাবে।`;
+ const total = Math.ceil((qty.value * price) / 1000);
+ totalPrice.value = `${total} টাকা`;
+ showPaymentInfo(total);
+ }
+
+ function showPaymentInfo(amount) {
+ const method = paymentMethod.value;
+ let number = method === 'bkash' ? 
+ 'পেমেন্ট করার জন্য নাম্বার পেতে হোয়াটস্যাপ এ মেসেজ করুন +994402623825' : 'পেমেন্ট করার জন্য নাম্বার পেতে হোয়াটস্যাপ এ মেসেজ করুন +994402623825';
+paymentInfo.innerHTML = `<p> ${amount} টাকা ${number} যোগাযোগ করুন ।</p>`; 
+ }
+
+ service.onchange = updatePrice;
+ qty.oninput = updatePrice;
+ paymentMethod.onchange = () => showPaymentInfo(totalPrice.value.replace(' টাকা', ''));
+
+ document.getElementById("orderForm").onsubmit = async function (e) {
+ e.preventDefault();
+ const orderId = "ORD" + Date.now().toString().slice(-6);
+ document.getElementById("order_id").value = orderId;
+
+ const form = e.target;
+ const formData = new FormData(form);
+ const response = await fetch(form.action, {
+ method: "POST",
+ body: formData
+ });
+ if (response.ok) {
+ document.getElementById("successMsg").textContent = `✅ অর্ডার সাবমিট হয়েছে! আপনার Order ID: ${orderId}`;
+ document.getElementById("successMsg").classList.remove("hidden");
+ form.reset();
+ } else {
+ document.getElementById("errorMsg").classList.remove("hidden");
+ }
+ };
+</script>
+</body>
+</html>
+
+
+<!-- Developed by R41H4N -->
