@@ -350,7 +350,62 @@
     animateCounter("orders", orders);
     animateCounter("clients", clients);
   </script>
-	
+	<!-- We Accept Payment Methods -->
+<div class="payment-footer">
+  <h4>We Accept</h4>
+  <div class="payment-logos">
+    <img src="bkash.png" alt="bKash">
+    <img src="nagad.png" alt="Nagad">
+    <img src="bank.png" alt="Bank">
+  </div>
+</div>
+
+<style>
+.payment-footer {
+  background-color: #f9f9f9;
+  padding: 30px 20px;
+  text-align: center;
+  animation: fadeSlideUp 1s ease forwards;
+  opacity: 0;
+}
+
+.payment-footer h4 {
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.payment-logos {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.payment-logos img {
+  height: 45px;
+  transition: transform 0.3s ease;
+  filter: grayscale(100%);
+}
+
+.payment-logos img:hover {
+  transform: scale(1.1);
+  filter: grayscale(0%);
+}
+
+/* Animation Keyframes */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
 <!-- Auto Counter end --->
 
 <script>
