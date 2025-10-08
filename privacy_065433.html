@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+  }
+  header {
+    background: #4CAF50;
+    color: #fff;
+    padding: 30px 20px;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 2rem;
+  }
+  .lang-switch {
+    margin-top: 10px;
+  }
+  .lang-switch button {
+    background: #fff;
+    border: 1px solid #4CAF50;
+    color: #4CAF50;
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  main {
+    max-width: 800px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  h2 {
+    color: #4CAF50;
+    margin-top: 30px;
+  }
+  p, ul {
+    margin: 15px 0;
+  }
+  ul {
+    margin-left: 20px;
+  }
+  footer {
+    text-align: center;
+    padding: 20px;
+    background: #eee;
+    margin-top: 40px;
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="title">Privacy Policy</h1>
+  <div class="lang-switch">
+    <button onclick="setLang('en')">English</button>
+    <button onclick="setLang('bn')">বাংলা</button>
+  </div>
+</header>
+
+<main id="content">
+  <!-- Content will be injected by JS -->
+</main>
+
+<footer>
+  &copy; 2025 Your Platform. All Rights Reserved.
+</footer>
+
+<script>
+const data = {
+  en: {
+    title: "Privacy Policy",
+    sections: [
+      { heading: "1. Information We Collect", content: "We may collect information like name, email, account details, usage data, and IP address for security purposes." },
+      { heading: "2. How We Use Your Information", content: "We use your information to provide services, communicate updates, improve the platform, and ensure security." },
+      { heading: "3. Sharing Your Information", content: "We do not sell your data. It may be shared with trusted partners only for service provision or legal requirements." },
+      { heading: "4. Cookies & Tracking", content: "We may use cookies to enhance your experience. You can disable cookies in your browser settings." },
+      { heading: "5. Your Rights", content: "You can access, update, or request deletion of your data. Contact us at support@yourdomain.com for assistance." },
+      { heading: "6. Updates to This Policy", content: "We may update this Privacy Policy. Any changes will be posted here with the effective date." }
+    ]
+  },
+  bn: {
+    title: "গোপনীয়তা নীতি",
+    sections: [
+      { heading: "১. আমরা কোন তথ্য সংগ্রহ করি", content: "আমরা নাম, ইমেইল, অ্যাকাউন্ট তথ্য, ব্যবহার সম্পর্কিত তথ্য এবং নিরাপত্তার জন্য IP ঠিকানা সংগ্রহ করতে পারি।" },
+      { heading: "২. আমরা কীভাবে তথ্য ব্যবহার করি", content: "আমরা আপনার তথ্য সেবা প্রদান, আপডেট জানানো, প্ল্যাটফর্ম উন্নত করা এবং নিরাপত্তা নিশ্চিত করার জন্য ব্যবহার করি।" },
+      { heading: "৩. তথ্য শেয়ার করা", content: "আমরা আপনার তথ্য বিক্রি করি না। এটি শুধুমাত্র বিশ্বাসযোগ্য পার্টনারদের সাথে সেবা প্রদানের বা আইনি প্রয়োজনের জন্য শেয়ার করা হতে পারে।" },
+      { heading: "৪. কুকিজ ও ট্র্যাকিং", content: "আমরা আপনার অভিজ্ঞতা উন্নত করতে কুকিজ ব্যবহার করতে পারি। আপনি চাইলে ব্রাউজার সেটিংসে কুকিজ বন্ধ করতে পারেন।" },
+      { heading: "৫. আপনার অধিকার", content: "আপনি আপনার তথ্য অ্যাক্সেস, আপডেট বা মুছে ফেলার অনুরোধ করতে পারেন। সাহায্যের জন্য contact করুন support@yourdomain.com এ।" },
+      { heading: "৬. নীতিমালার আপডেট", content: "আমরা এই গোপনীয়তা নীতি সময়ে সময়ে আপডেট করতে পারি। যে কোনো পরিবর্তন এখানে কার্যকরতার তারিখসহ প্রকাশ করা হবে।" }
+    ]
+  }
+};
+
+function setLang(lang) {
+  const contentEl = document.getElementById('content');
+  const titleEl = document.getElementById('title');
+  titleEl.textContent = data[lang].title;
+  contentEl.innerHTML = '';
+  data[lang].sections.forEach(section => {
+    const h2 = document.createElement('h2');
+    h2.textContent = section.heading;
+    const p = document.createElement('p');
+    p.textContent = section.content;
+    contentEl.appendChild(h2);
+    contentEl.appendChild(p);
+  });
+}
+
+// Default language
+setLang('en');
+</script>
+
+</body>
+</html>
