@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>সার্ভিস রুলস ও শর্তাবলী</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Noto Sans Bengali',sans-serif;
+    background:linear-gradient(135deg,#0b0b1a,#1b1b3b);
+    color:#f4f4f4;
+    line-height:1.9;
+    transition:background 0.4s,color 0.4s;
+  }
+  body.light{
+    background: #f4f4f4;
+    color:#1a1a1a;
+  }
+  header{text-align:center;padding:70px 20px 40px;position:relative;}
+  .logo{
+    width:100px;height:100px;
+    margin:0 auto 20px;
+    animation:float 3s ease-in-out infinite,glow 3s ease-in-out infinite alternate;
+    border-radius:50%;
+    background: radial-gradient(circle at center,#a855f7,#6d28d9);
+    box-shadow:0 0 20px rgba(168,85,247,0.6);
+  }
+  header img.logo-img{width:100px;height:100px;border-radius:50%;}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  @keyframes glow{0%{box-shadow:0 0 15px rgba(168,85,247,.4)}100%{box-shadow:0 0 35px rgba(168,85,247,1)}}
+  h1{font-size:2rem;color:#e5e7eb;}
+  body.light h1{color:#1a1a1a;}
+  main{max-width:950px;margin:30px auto;padding:0 20px;}
+  section{
+    position:relative;
+    background:rgba(255,255,255,0.05);
+    border-radius:18px;
+    margin-bottom:35px;
+    padding:50px 30px 30px;
+    box-shadow:0 0 20px rgba(0,0,0,0.3);
+    opacity:0;
+    transform:translateY(40px);
+    transition:all .8s ease,background 0.4s,color 0.4s;
+  }
+  body.light section{background: rgba(200,200,200,0.2);}
+  section.visible{opacity:1;transform:translateY(0);}
+  .favicon{
+    position:absolute;
+    top:15px;
+    left:15px;
+    width:24px;height:24px;
+  }
+  section h2{
+    color:#a78bfa;
+    font-size:1.35rem;
+    margin-bottom:15px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  body.light section h2{color:#6d28d9;}
+  section p,section li{font-size:1.05rem;margin-bottom:10px;}
+  ul{margin-left:25px;}
+  .highlight{
+    display:block;
+    background:rgba(96,165,250,0.15);
+    border-left:5px solid #60a5fa;
+    padding:8px 12px;
+    margin:12px 0;
+    color:#93c5fd;
+    font-weight:700;
+    border-radius:8px;
+  }
+  body.light .highlight{
+    background:rgba(99,102,241,0.15);
+    border-left:5px solid #6d28d9;
+    color:#4f46e5;
+  }
+  footer{text-align:center;padding:35px 0;color:#9ca3af;font-size:.95rem;}
+  footer span{color:#c084fc;}
+  .toggle-btn{
+    position:absolute;top:20px;right:20px;padding:10px 18px;background:#6d28d9;color:white;border:none;border-radius:8px;cursor:pointer;
+    font-weight:600;
+  }
+  body.light .toggle-btn{background:#a855f7;color:white;}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo.png" alt="Logo" class="logo-img">
+  <h1>সার্ভিস রুলস ও শর্তাবলী</h1>
+  <button class="toggle-btn" onclick="toggleDarkLight()">Light/Dark Mode</button>
+</header>
+
+<main>
+  <section>
+    <svg class="favicon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 2l12 0 3 6-6 14-12 0-3-6z"/></svg>
+    <h2>অর্ডার সম্পর্কিত নিয়মাবলী</h2>
+    <ul>
+      <li>অর্ডার করার আগে সার্ভিসের বিবরণ ভালোভাবে পড়ুন।</li>
+      <li>অর্ডার দেওয়ার পর তথ্য পরিবর্তন করা সম্ভব নয়।</li>
+      <li>ভুল লিংক বা ইউজারনেম দিলে দায় কাস্টমারের।</li>
+    </ul>
+    <div class="highlight">সঠিক তথ্য প্রদান করা অত্যন্ত জরুরি। ভুল ইনফো দিলে সার্ভিস ব্যর্থ হলেও রিফান্ড প্রযোজ্য নয়।</div>
+  </section>
+
+  <section>
+    <svg class="favicon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 1v22M1 12h22"/></svg>
+    <h2>পেমেন্ট নীতি</h2>
+    <ul>
+      <li>সব পেমেন্ট আগে করতে হবে।</li>
+      <li>পেমেন্ট গ্রহণ করি বিকাশ, নগদ ও রকেটের মাধ্যমে।</li>
+      <li>ভুল বা অসম্পূর্ণ লেনদেনের দায় প্রোভাইডারের নয়।</li>
+    </ul>
+    <div class="highlight">ভুল পেমেন্ট বা অসম্পূর্ণ লেনদেনের জন্য কোনো রিফান্ড নেই।</div>
+  </section>
+
+  <section>
+    <svg class="favicon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 8v8M8 12h8"/></svg>
+    <h2>রিফান্ড ও রিফিল নীতি</h2>
+    <ul>
+      <li>রিফান্ড শুধুমাত্র অসম্পূর্ণ অর্ডার বা সিস্টেম ত্রুটির ক্ষেত্রে।</li>
+      <li>রিফিল দেওয়া হবে নির্ধারিত সময়ের মধ্যে।</li>
+    </ul>
+    <div class="highlight">সার্ভিস সম্পূর্ণ হলে কোনো রিফান্ড প্রযোজ্য নয়।</div>
+  </section>
+
+  <section>
+    <svg class="favicon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2l6 6-6 6-6-6 6-6z"/></svg>
+    <h2>সার্ভিস কোয়ালিটি</h2>
+    <ul>
+      <li>আমরা সর্বোচ্চ মানের ও নিরাপদ সোর্স থেকে সার্ভিস প্রদান করি।</li>
+      <li>সার্ভিস সম্পূর্ণ বা ডেলিভারি টাইম সাধারণত <b>১–৭২ ঘণ্টার মধ্যে</b> হয়, কিছু ক্ষেত্রে নির্দিষ্ট সার্ভিসে আরও সময় লাগতে পারে।</li>
+      <li>কিছু সার্ভিস <b>কম-বেশি</b> আসতে পারে, এটি টেকনিক্যাল কারণে হয়ে থাকে; প্রোভাইডারের দায় নেই।</li>
+    </ul>
+    <div class="highlight">
+      ডেলিভারি টাইম এবং সার্ভিসের পরিমাণ প্রাকৃতিক পার্থক্য ও সিস্টেম লিমিট অনুযায়ী পরিবর্তিত হতে পারে। 
+      এজন্য সার্ভিস প্রোভাইডারের কোনো দায় নেই।
+    </div>
+  </section>
+
+  <section>
+    <svg class="favicon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    <h2>ক্যানসেল নীতি</h2>
+    <ul>
+      <li>অর্ডার শুরু হলে ক্যানসেল করা যাবে না।</li>
+      <li>ভুল ইনফো বা প্রাইভেট একাউন্টের জন্য দায় গ্রাহকের।</li>
+    </ul>
+  </section>
+
+<section>
+    <svg class="favicon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+    <h2>একাউন্ট ও জেন্ডার সম্পর্কিত নিয়ম</h2>
+    <ul>
+      <li>একাউন্ট মালিক ছেলে বা মেয়ে—দায় প্রোভাইডারের নয়।</li>
+      <li>আমরা শুধুমাত্র প্রদত্ত তথ্য অনুযায়ী কাজ করি।</li>
+    </ul>
+    <div class="highlight">একাউন্ট মালিকানা বা জেন্ডারের কারণে কোনো অভিযোগ প্রযোজ্য নয়।</div>
+  </section>
+
+  <section>
+    <svg class="favicon" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 2l10 4v12l-10 4-10-4V6l10-4z"/></svg>
+    <h2>দায়িত্ব অস্বীকৃতি</h2>
+    <ul>
+      <li>সার্ভিস ব্যবহার মানে আপনি সব শর্ত মেনে নিয়েছেন।</li>
+      <li>অবৈধ কাজে ব্যবহারের দায় ব্যবহারকারীর।</li>
+    </ul>
+    <div class="highlight">সার্ভিস ব্যবহারের আগে সব নিয়ম পড়ে নিন।</div>
+  </section>
+</main>
+
+<footer>
+  © <span>2025</span> | All Rights Reserved
+</footer>
+
+<script>
+  // Scroll animation for sections
+  const sections=document.querySelectorAll("section");
+  const reveal=()=>{sections.forEach(sec=>{const rect=sec.getBoundingClientRect();if(rect.top<window.innerHeight-100)sec.classList.add("visible");});};
+  window.addEventListener("scroll",reveal);
+  reveal();
+
+  // Dark/Light mode toggle
+  function toggleDarkLight(){
+    document.body.classList.toggle('light');
+  }
+</script>
+
+</body>
+</html>
