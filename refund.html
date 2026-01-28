@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Refund Policy - SMM Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: var(--gradient-bg);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 20px;
+      padding: 12px 24px;
+      background: var(--white);
+      border-radius: 50px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .back-link:hover {
+      transform: translateX(-5px);
+    }
+
+    .policy-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--white);
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .policy-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid rgba(98, 0, 234, 0.1);
+    }
+
+    .policy-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2em;
+      color: white;
+    }
+
+    .policy-title {
+      font-size: 2em;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 10px;
+    }
+
+    .policy-date {
+      color: #888;
+      font-size: 0.9em;
+    }
+
+    .policy-content h2 {
+      font-size: 1.3em;
+      color: var(--primary);
+      margin: 25px 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .policy-content h2 i {
+      font-size: 0.9em;
+    }
+
+    .policy-content p {
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 15px;
+    }
+
+    .policy-content ul {
+      margin: 15px 0;
+      padding-left: 25px;
+    }
+
+    .policy-content li {
+      color: #555;
+      line-height: 1.8;
+      margin-bottom: 8px;
+    }
+
+    .highlight-box {
+      background: linear-gradient(135deg, #fff3cd, #ffeeba);
+      border-left: 4px solid #ff9800;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .highlight-box p {
+      margin: 0;
+      color: #856404;
+    }
+
+    .highlight-box i {
+      color: #ff9800;
+      margin-right: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .policy-container {
+        padding: 25px;
+      }
+
+      .policy-title {
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Home
+  </a>
+
+  <div class="policy-container">
+    <div class="policy-header">
+      <div class="policy-icon">
+        <i class="fas fa-undo"></i>
+      </div>
+      <h1 class="policy-title">Refund Policy</h1>
+      <p class="policy-date">Last updated: January 2026</p>
+    </div>
+
+    <div class="policy-content">
+      <h2><i class="fas fa-info-circle"></i> Refund Eligibility</h2>
+      <p>We offer refunds under specific circumstances. Please read the following conditions carefully:</p>
+
+      <div class="highlight-box">
+        <p><i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> Refunds are processed to your account balance, not to the original payment method.</p>
+      </div>
+
+      <h2><i class="fas fa-check-circle"></i> When Refunds Are Applicable</h2>
+      <ul>
+        <li><strong>Order Not Started:</strong> If your order has not been started within 24 hours</li>
+        <li><strong>Service Unavailable:</strong> If the service becomes unavailable after payment</li>
+        <li><strong>Partial Delivery:</strong> Refund for the undelivered portion of the order</li>
+        <li><strong>Wrong Link:</strong> If you provided the correct link but we processed the wrong one</li>
+      </ul>
+
+      <h2><i class="fas fa-times-circle"></i> When Refunds Are NOT Applicable</h2>
+      <ul>
+        <li>Orders that have been fully completed</li>
+        <li>Drops or decreases after order completion (this is normal)</li>
+        <li>If you provided an incorrect link</li>
+        <li>Private or restricted accounts</li>
+        <li>Account suspension by the platform</li>
+        <li>Services that are marked as "Non-Refundable"</li>
+      </ul>
+
+      <h2><i class="fas fa-clock"></i> Refund Processing Time</h2>
+      <p>Refund requests are typically processed within 24-48 hours. The refunded amount will be added to your account balance automatically.</p>
+
+      <h2><i class="fas fa-paper-plane"></i> How to Request a Refund</h2>
+      <p>To request a refund, please contact our support team with:</p>
+      <ul>
+        <li>Your Order ID</li>
+        <li>Reason for refund request</li>
+        <li>Any supporting screenshots or evidence</li>
+      </ul>
+
+      <h2><i class="fas fa-headset"></i> Contact Support</h2>
+      <p>For refund requests or any questions about our refund policy, please reach out through our WhatsApp or Telegram support channels.</p>
+    </div>
+  </div>
+</body>
+</html>

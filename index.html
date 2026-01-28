@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SMM Panel - Premium Social Media Services</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+</head>
+<body>
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-content">
+      <div class="loader-ring">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+      <p class="loader-text">SMM Panel</p>
+      <p class="loader-subtext">Loading services...</p>
+      <div class="loader-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="glass-nav">
+    <div class="nav-container">
+      <div class="logo-container">
+        <i class="fas fa-bolt logo-icon"></i>
+        <span class="brand-name">SMM Panel</span>
+      </div>
+      <div class="nav-links" id="navLinks">
+        <a href="#services"><i class="fas fa-list"></i> Services</a>
+        <a href="order_track.html"><i class="fas fa-search-location"></i> Track Order</a>
+        <a href="#contact"><i class="fas fa-envelope"></i> Contact</a>
+      </div>
+      <div class="nav-actions">
+        <button class="nav-btn" onclick="toggleMobileMenu()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+  <div class="mobile-menu hidden" id="mobileMenu">
+    <a href="#services" onclick="closeMobileMenu()"><i class="fas fa-list"></i> Services</a>
+    <a href="order_track.html" onclick="closeMobileMenu()"><i class="fas fa-search-location"></i> Track Order</a>
+    <a href="#contact" onclick="closeMobileMenu()"><i class="fas fa-envelope"></i> Contact</a>
+    <a href="admin.html" onclick="closeMobileMenu()"><i class="fas fa-user-shield"></i> Admin</a>
+  </div>
+
+  <section class="hero-section">
+    <div class="hero-particles"></div>
+    <div class="hero-content">
+      <h1 class="hero-title animate-fade-in">SMM Panel Services</h1>
+      <p class="hero-subtitle animate-fade-in-delay">Best prices for Social Media Marketing services</p>
+      
+      <div class="search-section animate-scale-in">
+        <div class="search-container">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search services..." oninput="filterServices()">
+          <button onclick="filterServices()">
+            <span>Search</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="quick-categories" id="quickCategories">
+        <span class="quick-cat active" onclick="filterByCategory('all')">
+          <i class="fas fa-th-large"></i> All Services
+        </span>
+      </div>
+
+    </div>
+    <div class="hero-wave">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,60 C360,120 1080,0 1440,60 L1440,120 L0,120 Z" fill="currentColor"></path>
+      </svg>
+    </div>
+  </section>
+
+  <div class="section-header" id="services">
+    <div class="section-icon"><i class="fas fa-rocket"></i></div>
+    <h2>Our Services</h2>
+    <p>Premium SMM services at affordable prices</p>
+  </div>
+
+  <section class="service-list" id="serviceList">
+    <div class="skeleton-container" id="skeletonLoader">
+      <div class="skeleton-card">
+        <div class="skeleton skeleton-image"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-price"></div>
+        <div class="skeleton skeleton-button"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton skeleton-image"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-price"></div>
+        <div class="skeleton skeleton-button"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton skeleton-image"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-price"></div>
+        <div class="skeleton skeleton-button"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton skeleton-image"></div>
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-price"></div>
+        <div class="skeleton skeleton-button"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer" id="contact">
+    <div class="footer-wave">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,60 C360,0 1080,120 1440,60 L1440,0 L0,0 Z" fill="currentColor"></path>
+      </svg>
+    </div>
+    
+    <div class="footer-content">
+      <div class="footer-section contact-section">
+        <h3><i class="fas fa-envelope"></i> Contact Us</h3>
+        <form id="contactForm" class="contact-form">
+          <div class="form-group">
+            <div class="input-wrapper">
+              <i class="fas fa-user"></i>
+              <input type="text" name="name" placeholder="Your Name" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-wrapper">
+              <i class="fas fa-envelope"></i>
+              <input type="email" name="email" placeholder="Your Email" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="input-wrapper textarea-wrapper">
+              <i class="fas fa-comment"></i>
+              <textarea name="message" placeholder="Your Message" required></textarea>
+            </div>
+          </div>
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-paper-plane"></i> Send Message
+          </button>
+        </form>
+      </div>
+
+      <div class="footer-section about-section">
+        <div class="footer-logo">
+          <i class="fas fa-bolt"></i>
+          <span>SMM Panel</span>
+        </div>
+        <div class="about-content">
+          <h4><i class="fas fa-info-circle"></i> About Us</h4>
+          <p class="footer-message">Welcome to <strong>SMM Panel</strong> - your trusted source for social media marketing services. We provide high-quality services at the best prices.</p>
+          <p class="about-text"><strong>Why Choose Us?</strong></p>
+          <ul class="about-list">
+            <li><i class="fas fa-check"></i> Best Prices</li>
+            <li><i class="fas fa-check"></i> Fast Delivery</li>
+            <li><i class="fas fa-check"></i> 24/7 Support</li>
+            <li><i class="fas fa-check"></i> High Quality</li>
+          </ul>
+        </div>
+        
+        <div class="stats-footer">
+          <div class="stat-item-footer">
+            <div class="stat-icon"><i class="fas fa-list"></i></div>
+            <div class="stat-number" id="serviceCountFooter">0+</div>
+            <div class="stat-label">Services</div>
+          </div>
+          <div class="stat-item-footer">
+            <div class="stat-icon"><i class="fas fa-smile"></i></div>
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Happy Customers</div>
+          </div>
+          <div class="stat-item-footer">
+            <div class="stat-icon"><i class="fas fa-headset"></i></div>
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Support</div>
+          </div>
+        </div>
+        
+        <div class="payment-methods">
+          <h4><i class="fas fa-wallet"></i> Payment Methods</h4>
+          <div class="payment-icons">
+            <div class="payment-item bkash">
+              <i class="fas fa-mobile-alt"></i>
+              <span>bKash</span>
+            </div>
+            <div class="payment-item nagad">
+              <i class="fas fa-mobile-alt"></i>
+              <span>Nagad</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="social-links">
+          <a href="#" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" target="_blank" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
+          <a href="#" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+        
+        <div class="quick-links">
+          <h4><i class="fas fa-link"></i> Quick Links</h4>
+          <div class="quick-links-list">
+            <a href="privacy.html"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+            <a href="terms.html"><i class="fas fa-file-contract"></i> Terms of Service</a>
+            <a href="refund.html"><i class="fas fa-undo"></i> Refund Policy</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p id="copyright"></p>
+      <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+        <a href="order_track.html" class="track-order-btn"><i class="fas fa-search-location"></i> Track Order</a>
+        <a href="admin.html" class="admin-link"><i class="fas fa-user-shield"></i> Admin Panel</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="floating-support">
+    <a href="https://wa.me/8801762587191" class="floating-btn whatsapp-btn" target="_blank" title="WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+      <span class="btn-tooltip">WhatsApp</span>
+    </a>
+    <a href="https://t.me/smmpanel" class="floating-btn telegram-btn" target="_blank" title="Telegram">
+      <i class="fab fa-telegram-plane"></i>
+      <span class="btn-tooltip">Telegram</span>
+    </a>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
