@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Buy API Key - SMM Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <style>
+    :root {
+      --primary: #6200ea;
+      --primary-dark: #4a00b0;
+      --accent: #00e676;
+      --gradient: linear-gradient(135deg, #6200ea 0%, #9c4dff 100%);
+      --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --dark: #1a1a2e;
+      --text: #333;
+      --text-muted: #666;
+      --white: #ffffff;
+      --shadow: 0 10px 40px rgba(98, 0, 234, 0.15);
+      --transition: all 0.3s ease;
+      --bkash: #E2136E;
+      --nagad: #F6921E;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--gradient-bg);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 20px;
+      padding: 12px 24px;
+      background: var(--white);
+      border-radius: 50px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .back-link:hover {
+      transform: translateX(-5px);
+    }
+
+    .main-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .key-card {
+      background: var(--white);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      background: var(--gradient);
+      padding: 30px;
+      text-align: center;
+      color: white;
+    }
+
+    .header-icon {
+      width: 70px;
+      height: 70px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 15px;
+      font-size: 1.8em;
+    }
+
+    .header-title {
+      font-size: 1.5em;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .header-subtitle {
+      opacity: 0.9;
+      font-size: 0.9em;
+    }
+
+    .card-body {
+      padding: 30px;
+    }
+
+    .amount-section {
+      margin-bottom: 25px;
+    }
+
+    .section-label {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label i {
+      color: var(--primary);
+    }
+
+    .amount-input-wrapper {
+      position: relative;
+    }
+
+    .amount-input {
+      width: 100%;
+      padding: 18px 20px 18px 50px;
+      border: 2px solid #e0e0e0;
+      border-radius: 16px;
+      font-size: 1.2em;
+      font-weight: 600;
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .amount-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(98, 0, 234, 0.1);
+    }
+
+    .currency-symbol {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2em;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .quick-amounts {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .quick-amount-btn {
+      padding: 10px 18px;
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+      transition: var(--transition);
+    }
+
+    .quick-amount-btn:hover {
+      background: var(--gradient);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .summary-box {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px dashed #ddd;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+      padding-top: 15px;
+      font-weight: 700;
+      font-size: 1.1em;
+      color: var(--primary);
+    }
+
+    .summary-label {
+      color: var(--text-muted);
+    }
+
+    .summary-value {
+      font-weight: 600;
+    }
+
+    .proceed-btn {
+      width: 100%;
+      padding: 18px;
+      background: var(--gradient);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .proceed-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(98, 0, 234, 0.4);
+    }
+
+    .proceed-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Payment Modal */
+    .payment-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .payment-overlay.show {
+      display: flex;
+    }
+
+    .payment-modal {
+      background: white;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 450px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalSlide 0.4s ease;
+    }
+
+    @keyframes modalSlide {
+      from { opacity: 0; transform: scale(0.9) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+      padding: 25px;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2em;
+      transition: var(--transition);
+    }
+
+    .close-modal:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .modal-amount {
+      font-size: 2.5em;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .modal-subtitle {
+      opacity: 0.8;
+      font-size: 0.9em;
+    }
+
+    .payment-methods {
+      padding: 25px;
+    }
+
+    .payment-title {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 1.1em;
+    }
+
+    .payment-options {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .payment-option:hover {
+      border-color: var(--primary);
+      transform: translateX(5px);
+    }
+
+    .payment-option.selected {
+      border-color: var(--primary);
+      background: rgba(98, 0, 234, 0.05);
+    }
+
+    .payment-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      color: white;
+      font-weight: 700;
+    }
+
+    .payment-logo.bkash {
+      background: var(--bkash);
+    }
+
+    .payment-logo.nagad {
+      background: var(--nagad);
+    }
+
+    .payment-info h4 {
+      font-size: 1.1em;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .payment-info p {
+      font-size: 0.85em;
+      color: var(--text-muted);
+    }
+
+    .payment-radio {
+      margin-left: auto;
+      width: 24px;
+      height: 24px;
+      border: 2px solid #ddd;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .payment-option.selected .payment-radio {
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+
+    .payment-option.selected .payment-radio::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    /* Payment Form */
+    .payment-form {
+      padding: 0 25px 25px;
+      display: none;
+    }
+
+    .payment-form.show {
+      display: block;
+    }
+
+    .form-divider {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 20px 0;
+      color: var(--text-muted);
+      font-size: 0.9em;
+    }
+
+    .form-divider::before,
+    .form-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e0e0e0;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-size: 0.9em;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 1em;
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+
+    .pay-now-btn {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: 16px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      color: white;
+    }
+
+    .pay-now-btn.bkash {
+      background: var(--bkash);
+    }
+
+    .pay-now-btn.nagad {
+      background: var(--nagad);
+    }
+
+    .pay-now-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .security-note {
+      text-align: center;
+      margin-top: 15px;
+      color: var(--text-muted);
+      font-size: 0.8em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .security-note i {
+      color: #4caf50;
+    }
+
+    /* Features */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .feature-item {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .feature-icon {
+      width: 50px;
+      height: 50px;
+      background: var(--gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+      color: white;
+      font-size: 1.2em;
+    }
+
+    .feature-title {
+      font-weight: 600;
+      font-size: 0.9em;
+      color: var(--text);
+    }
+
+    @media (max-width: 500px) {
+      .card-body {
+        padding: 20px;
+      }
+
+      .modal-amount {
+        font-size: 2em;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to Home
+  </a>
+
+  <div class="main-container">
+    <div class="key-card">
+      <div class="card-header">
+        <div class="header-icon">
+          <i class="fas fa-key"></i>
+        </div>
+        <h1 class="header-title">Buy API Key</h1>
+        <p class="header-subtitle">Get your API key with instant balance</p>
+      </div>
+
+      <div class="card-body">
+        <div class="amount-section">
+          <label class="section-label">
+            <i class="fas fa-wallet"></i> Enter Amount
+          </label>
+          <div class="amount-input-wrapper">
+            <span class="currency-symbol">৳</span>
+            <input type="number" id="amountInput" class="amount-input" placeholder="0.00" min="100">
+          </div>
+          <div class="quick-amounts">
+            <button class="quick-amount-btn" onclick="setAmount(100)">৳100</button>
+            <button class="quick-amount-btn" onclick="setAmount(500)">৳500</button>
+            <button class="quick-amount-btn" onclick="setAmount(1000)">৳1000</button>
+            <button class="quick-amount-btn" onclick="setAmount(2000)">৳2000</button>
+          </div>
+        </div>
+
+        <div class="summary-box">
+          <div class="summary-row">
+            <span class="summary-label">Amount</span>
+            <span class="summary-value" id="summaryAmount">৳0.00</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Service Charge</span>
+            <span class="summary-value" id="summaryCharge">৳0.00</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Total Payable</span>
+            <span class="summary-value" id="summaryTotal">৳0.00</span>
+          </div>
+        </div>
+
+        <button class="proceed-btn" id="proceedBtn" onclick="showPaymentModal()" disabled>
+          <i class="fas fa-credit-card"></i> Proceed to Payment
+        </button>
+      </div>
+    </div>
+
+    <div class="features">
+      <div class="feature-item">
+        <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+        <div class="feature-title">Instant Activation</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="feature-title">Secure Payment</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><i class="fas fa-headset"></i></div>
+        <div class="feature-title">24/7 Support</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><i class="fas fa-sync"></i></div>
+        <div class="feature-title">Auto Recharge</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="payment-overlay" id="paymentOverlay">
+    <div class="payment-modal">
+      <div class="modal-header">
+        <button class="close-modal" onclick="closePaymentModal()">
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="modal-amount" id="modalAmount">৳0.00</div>
+        <p class="modal-subtitle">Select payment method</p>
+      </div>
+
+      <div class="payment-methods">
+        <h3 class="payment-title"><i class="fas fa-mobile-alt"></i> Mobile Banking</h3>
+        <div class="payment-options">
+          <div class="payment-option" onclick="selectPayment('bkash')">
+            <div class="payment-logo bkash">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="payment-info">
+              <h4>bKash</h4>
+              <p>Pay with bKash mobile wallet</p>
+            </div>
+            <div class="payment-radio"></div>
+          </div>
+
+          <div class="payment-option" onclick="selectPayment('nagad')">
+            <div class="payment-logo nagad">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="payment-info">
+              <h4>Nagad</h4>
+              <p>Pay with Nagad mobile wallet</p>
+            </div>
+            <div class="payment-radio"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="payment-form" id="paymentForm">
+        <div class="payment-number-box" id="paymentNumberBox" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 20px; border-radius: 16px; margin-bottom: 20px; text-align: center;">
+          <p style="font-size: 0.9em; color: #666; margin-bottom: 10px;">Send money to this number:</p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 10px; background: white; padding: 15px; border-radius: 12px; border: 2px dashed #ddd;">
+            <span id="paymentNumberDisplay" style="font-size: 1.4em; font-weight: 700; letter-spacing: 1px;">Loading...</span>
+            <button onclick="copyPaymentNumber()" style="background: var(--gradient); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 0.9em;">
+              <i class="fas fa-copy"></i> Copy
+            </button>
+          </div>
+          
+          <div id="paymentInstructions" style="background: white; border-radius: 12px; padding: 15px; margin-top: 15px; text-align: left; border: 1px solid #e0e0e0;">
+            <p style="font-weight: 600; color: #333; margin-bottom: 10px; font-size: 0.95em;"><i class="fas fa-list-ol" style="color: var(--primary);"></i> পেমেন্ট নির্দেশনা:</p>
+            <ol style="margin: 0; padding-left: 20px; color: #555; font-size: 0.85em; line-height: 1.8;">
+              <li><span id="methodName" style="font-weight: 600;">bKash/Nagad</span> অ্যাপ ওপেন করুন</li>
+              <li>"Send Money" অপশনে ক্লিক করুন</li>
+              <li>উপরের নম্বরে টাকা পাঠান</li>
+              <li>Amount: <strong id="instructionAmount">৳0</strong></li>
+              <li>Reference: <strong>API Key</strong></li>
+              <li>TrxID সংরক্ষণ করুন</li>
+            </ol>
+            <p style="background: #fff3cd; padding: 10px; border-radius: 8px; margin-top: 12px; font-size: 0.8em; color: #856404;">
+              <i class="fas fa-exclamation-triangle"></i> Send Money করার পর নিচে আপনার তথ্য দিন
+            </p>
+          </div>
+        </div>
+
+        <div class="form-divider">Enter your details</div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-phone"></i> Your Mobile Number</label>
+          <input type="tel" id="phoneNumber" class="form-input" placeholder="01XXXXXXXXX" maxlength="11">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Number</label>
+          <input type="tel" id="whatsappNumber" class="form-input" placeholder="01XXXXXXXXX (Key পাঠানো হবে)" maxlength="11">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-receipt"></i> Transaction ID (TrxID)</label>
+          <input type="text" id="trxId" class="form-input" placeholder="Enter your TrxID">
+        </div>
+
+        <button class="pay-now-btn" id="payNowBtn" onclick="submitPayment()">
+          <i class="fas fa-check-circle"></i> Confirm Payment
+        </button>
+
+        <p class="security-note">
+          <i class="fas fa-lock"></i> Your payment is secure and encrypted
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5eRGoGPmJiYn0Ij4fmVEPfllzfBPXGqs",
+      authDomain: "admin-panel-7f213.firebaseapp.com",
+      databaseURL: "https://admin-panel-7f213-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "admin-panel-7f213",
+      storageBucket: "admin-panel-7f213.firebasestorage.app",
+      messagingSenderId: "457002341000",
+      appId: "1:457002341000:web:140bcba3bf808444d4c53d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let currentAmount = 0;
+    let selectedPayment = null;
+
+    const amountInput = document.getElementById('amountInput');
+    const proceedBtn = document.getElementById('proceedBtn');
+
+    amountInput.addEventListener('input', updateSummary);
+
+    function setAmount(amount) {
+      amountInput.value = amount;
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const amount = parseFloat(amountInput.value) || 0;
+      currentAmount = amount;
+
+      const charge = 0;
+      const total = amount + charge;
+
+      document.getElementById('summaryAmount').textContent = '৳' + amount.toFixed(2);
+      document.getElementById('summaryCharge').textContent = '৳' + charge.toFixed(2);
+      document.getElementById('summaryTotal').textContent = '৳' + total.toFixed(2);
+
+      proceedBtn.disabled = amount < 100;
+    }
+
+    function showPaymentModal() {
+      if (currentAmount < 100) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Minimum Amount',
+          text: 'Minimum amount is ৳100',
+          confirmButtonColor: '#6200ea'
+        });
+        return;
+      }
+
+      document.getElementById('modalAmount').textContent = '৳' + currentAmount.toFixed(2);
+      document.getElementById('paymentOverlay').classList.add('show');
+      selectedPayment = null;
+      document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+      document.getElementById('paymentForm').classList.remove('show');
+    }
+
+    function closePaymentModal() {
+      document.getElementById('paymentOverlay').classList.remove('show');
+    }
+
+    let paymentNumbers = { bkash: '', nagad: '' };
+
+    // Load payment numbers from Firebase
+    db.ref('settings/payment').once('value', (snapshot) => {
+      const settings = snapshot.val() || {};
+      paymentNumbers.bkash = settings.bkash || 'Not Set';
+      paymentNumbers.nagad = settings.nagad || 'Not Set';
+    });
+
+    function selectPayment(method) {
+      selectedPayment = method;
+      
+      document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+      event.currentTarget.classList.add('selected');
+
+      const paymentForm = document.getElementById('paymentForm');
+      paymentForm.classList.add('show');
+
+      const payNowBtn = document.getElementById('payNowBtn');
+      payNowBtn.className = 'pay-now-btn ' + method;
+
+      // Show payment number based on selected method
+      const paymentNumber = paymentNumbers[method] || 'Not Set';
+      document.getElementById('paymentNumberDisplay').textContent = paymentNumber;
+      
+      // Update box color based on method
+      const box = document.getElementById('paymentNumberBox');
+      if (method === 'bkash') {
+        box.style.background = 'linear-gradient(135deg, #fce4ec, #f8bbd9)';
+      } else {
+        box.style.background = 'linear-gradient(135deg, #fff3e0, #ffe0b2)';
+      }
+
+      // Update instructions
+      document.getElementById('methodName').textContent = method === 'bkash' ? 'bKash' : 'Nagad';
+      document.getElementById('instructionAmount').textContent = '৳' + currentAmount;
+    }
+
+    function copyPaymentNumber() {
+      const number = document.getElementById('paymentNumberDisplay').textContent;
+      if (number && number !== 'Not Set' && number !== 'Loading...') {
+        navigator.clipboard.writeText(number).then(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Copied!',
+            text: 'Number copied to clipboard',
+            timer: 1000,
+            showConfirmButton: false
+          });
+        });
+      }
+    }
+
+    function generateApiKey() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let key = 'SMM-';
+      for (let i = 0; i < 24; i++) {
+        key += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return key;
+    }
+
+    function submitPayment() {
+      const phone = document.getElementById('phoneNumber').value.trim();
+      const whatsapp = document.getElementById('whatsappNumber').value.trim();
+      const trxId = document.getElementById('trxId').value.trim();
+
+      if (!phone || phone.length !== 11) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Number',
+          text: 'Please enter a valid 11-digit mobile number',
+          confirmButtonColor: '#6200ea'
+        });
+        return;
+      }
+
+      if (!whatsapp || whatsapp.length !== 11) {
+        Swal.fire({
+          icon: 'error',
+          title: 'WhatsApp Number Required',
+          text: 'Please enter a valid 11-digit WhatsApp number',
+          confirmButtonColor: '#6200ea'
+        });
+        return;
+      }
+
+      if (!trxId) {
+        Swal.fire({
+          icon: 'error',
+          title: 'TrxID Required',
+          text: 'Please enter your transaction ID',
+          confirmButtonColor: '#6200ea'
+        });
+        return;
+      }
+
+      Swal.fire({
+        title: 'Processing Payment...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      const newKey = generateApiKey();
+      const keyData = {
+        key: newKey,
+        name: 'User-' + phone.slice(-4),
+        balance: currentAmount,
+        usedLimit: 0,
+        active: false,
+        pending: true,
+        phone: phone,
+        whatsapp: whatsapp,
+        trxId: trxId,
+        paymentMethod: selectedPayment,
+        amount: currentAmount,
+        createdAt: Date.now(),
+        time: new Date().toLocaleString('en-BD', { timeZone: 'Asia/Dhaka' })
+      };
+
+      db.ref('pendingKeys').push(keyData).then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Payment Submitted!',
+          html: `
+            <p style="margin-bottom: 15px;">Your payment is being verified.</p>
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; text-align: left;">
+              <p style="margin: 5px 0;"><strong>Amount:</strong> ৳${currentAmount}</p>
+              <p style="margin: 5px 0;"><strong>Method:</strong> ${selectedPayment.toUpperCase()}</p>
+              <p style="margin: 5px 0;"><strong>TrxID:</strong> ${trxId}</p>
+            </div>
+            <p style="margin-top: 15px; color: #666; font-size: 0.9em;">Your API key will be activated after verification. Please wait for admin approval.</p>
+          `,
+          confirmButtonColor: '#6200ea',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          closePaymentModal();
+          amountInput.value = '';
+          document.getElementById('phoneNumber').value = '';
+          document.getElementById('trxId').value = '';
+          updateSummary();
+        });
+      }).catch((error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Something went wrong. Please try again.',
+          confirmButtonColor: '#6200ea'
+        });
+      });
+    }
+
+    document.getElementById('paymentOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'paymentOverlay') {
+        closePaymentModal();
+      }
+    });
+  </script>
+</body>
+</html>

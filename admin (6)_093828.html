@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - SMM Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: var(--dark-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .admin-container {
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border);
+      animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hidden { display: none !important; }
+
+    .panel-header {
+      background: var(--gradient);
+      padding: 25px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .header-icon {
+      width: 55px;
+      height: 55px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: white;
+    }
+
+    .header-text h2 {
+      font-size: 1.4em;
+      font-weight: 600;
+      color: white;
+    }
+
+    .header-text p {
+      font-size: 0.85em;
+      opacity: 0.85;
+      color: white;
+    }
+
+    .panel-content {
+      padding: 25px;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+
+    .panel-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .panel-content::-webkit-scrollbar-track {
+      background: var(--border);
+      border-radius: 10px;
+    }
+
+    .panel-content::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9em;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .admin-input {
+      width: 100%;
+      padding: 14px 14px 14px 45px;
+      background: var(--dark-bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: 1em;
+      transition: var(--transition);
+    }
+
+    .admin-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(98, 0, 234, 0.2);
+    }
+
+    .admin-textarea {
+      min-height: 100px;
+      resize: vertical;
+      padding-left: 14px;
+    }
+
+    .admin-select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a0a0b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 20px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: var(--transition);
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(98, 0, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--card-hover);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #f44336, #e53935);
+      color: white;
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 25px 0;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1em;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--text);
+    }
+
+    .section-title i {
+      color: var(--primary);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, var(--card-hover), var(--card-bg));
+      padding: 20px;
+      border-radius: 16px;
+      text-align: center;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .stat-card i {
+      font-size: 2em;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .stat-card.services i { color: #9c27b0; }
+    .stat-card.orders i { color: #ff9800; }
+    .stat-card.pending i { color: #2196f3; }
+    .stat-card.completed i { color: #4caf50; }
+    .stat-card.keys i { color: #00bcd4; }
+    .stat-card.income i { color: #4caf50; }
+
+    .stat-number {
+      font-size: 2em;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.85em;
+      color: var(--text-muted);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      background: var(--card-bg);
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .back-link:hover {
+      transform: translateX(-5px);
+      background: var(--primary);
+      color: white;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .menu-card {
+      background: var(--card-hover);
+      padding: 25px 20px;
+      border-radius: 16px;
+      text-align: center;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .menu-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(98, 0, 234, 0.2);
+    }
+
+    .menu-card i {
+      font-size: 2.5em;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .menu-card h3 {
+      font-size: 1em;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    .menu-card p {
+      font-size: 0.8em;
+      color: var(--text-muted);
+    }
+
+    .item-card {
+      background: var(--card-hover);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .item-card:hover {
+      border-color: var(--primary);
+      transform: translateX(5px);
+    }
+
+    .item-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .item-icon {
+      width: 50px;
+      height: 50px;
+      background: var(--gradient);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3em;
+      color: white;
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-name {
+      font-weight: 600;
+      font-size: 1em;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .item-meta {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      font-size: 0.85em;
+      color: var(--text-muted);
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .item-actions button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-edit {
+      background: rgba(98, 0, 234, 0.2);
+      color: var(--primary);
+    }
+
+    .btn-edit:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-delete {
+      background: rgba(244, 67, 54, 0.2);
+      color: var(--danger);
+    }
+
+    .btn-delete:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .key-card {
+      background: linear-gradient(135deg, var(--card-hover), rgba(98, 0, 234, 0.1));
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 15px;
+      border: 1px solid var(--border);
+    }
+
+    .key-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .key-value {
+      font-family: monospace;
+      background: var(--dark-bg);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      color: var(--accent);
+      word-break: break-all;
+    }
+
+    .key-status {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75em;
+      font-weight: 600;
+    }
+
+    .key-status.active {
+      background: rgba(76, 175, 80, 0.2);
+      color: #4caf50;
+    }
+
+    .key-status.inactive {
+      background: rgba(244, 67, 54, 0.2);
+      color: #f44336;
+    }
+
+    .key-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .key-detail {
+      background: var(--dark-bg);
+      padding: 12px;
+      border-radius: 10px;
+    }
+
+    .key-detail-label {
+      font-size: 0.75em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .key-detail-value {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--gradient);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state i {
+      font-size: 3em;
+      opacity: 0.3;
+      margin-bottom: 15px;
+    }
+
+    .order-item {
+      background: linear-gradient(135deg, var(--card-hover) 0%, rgba(98, 0, 234, 0.05) 100%);
+      padding: 20px;
+      border-radius: 16px;
+      margin-bottom: 15px;
+      border: 2px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .order-item:hover {
+      border-color: var(--primary);
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .order-id {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 0.9em;
+    }
+
+    .order-time {
+      font-size: 0.8em;
+      color: var(--text-muted);
+    }
+
+    .order-total {
+      display: inline-block;
+      background: var(--success);
+      color: white;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.95em;
+    }
+
+    .order-details {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .order-detail {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9em;
+      color: var(--text-muted);
+    }
+
+    .order-detail i {
+      width: 20px;
+      color: var(--primary);
+    }
+
+    .status-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .status-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.8em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .status-btn.pending { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
+    .status-btn.processing { background: rgba(33, 150, 243, 0.2); color: #2196f3; }
+    .status-btn.completed { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
+    .status-btn.cancelled { background: rgba(244, 67, 54, 0.2); color: #f44336; }
+
+    .status-btn.active { color: white !important; }
+    .status-btn.pending.active { background: #ff9800; }
+    .status-btn.processing.active { background: #2196f3; }
+    .status-btn.completed.active { background: #4caf50; }
+    .status-btn.cancelled.active { background: #f44336; }
+
+    .filter-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      padding: 10px 20px;
+      background: var(--card-hover);
+      border: 1px solid var(--border);
+      border-radius: 25px;
+      color: var(--text-muted);
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .filter-tab:hover, .filter-tab.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-content">
+      <div class="loader-ring">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <p class="loader-text">Admin Panel</p>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <a href="index.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Panel
+    </a>
+
+    <div class="panel" id="loginPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-lock"></i></div>
+        <div class="header-text">
+          <h2>Admin Login</h2>
+          <p>Enter your credentials to continue</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-user"></i> Username</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user"></i>
+              <input type="text" id="username" class="admin-input" placeholder="Enter username" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-key"></i> Password</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock"></i>
+              <input type="password" id="password" class="admin-input" placeholder="Enter password" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="menuPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-th-large"></i></div>
+        <div class="header-text">
+          <h2>Admin Dashboard</h2>
+          <p>Manage your SMM Panel</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <div class="stats-grid">
+          <div class="stat-card services">
+            <i class="fas fa-list"></i>
+            <div class="stat-number" id="totalServices">0</div>
+            <div class="stat-label">Services</div>
+          </div>
+          <div class="stat-card orders">
+            <i class="fas fa-shopping-cart"></i>
+            <div class="stat-number" id="totalOrders">0</div>
+            <div class="stat-label">Orders</div>
+          </div>
+          <div class="stat-card keys">
+            <i class="fas fa-key"></i>
+            <div class="stat-number" id="totalKeys">0</div>
+            <div class="stat-label">API Keys</div>
+          </div>
+          <div class="stat-card income">
+            <i class="fas fa-dollar-sign"></i>
+            <div class="stat-number" id="totalIncome">৳0</div>
+            <div class="stat-label">Total Income</div>
+          </div>
+        </div>
+        <div class="menu-grid">
+          <div class="menu-card" onclick="showPanel('addServicePanel')">
+            <i class="fas fa-plus-circle"></i>
+            <h3>Add Service</h3>
+            <p>Add new SMM service</p>
+          </div>
+          <div class="menu-card" onclick="showPanel('servicesPanel')">
+            <i class="fas fa-list"></i>
+            <h3>All Services</h3>
+            <p>View & edit services</p>
+          </div>
+          <div class="menu-card" onclick="showPanel('keysPanel')">
+            <i class="fas fa-key"></i>
+            <h3>API Keys</h3>
+            <p>Manage API keys</p>
+          </div>
+          <div class="menu-card" onclick="showPanel('ordersPanel')">
+            <i class="fas fa-shopping-bag"></i>
+            <h3>Orders</h3>
+            <p>Manage orders</p>
+          </div>
+          <div class="menu-card" onclick="showPanel('apiSettingsPanel')">
+            <i class="fas fa-plug"></i>
+            <h3>API Settings</h3>
+            <p>SMM Mother Panel API</p>
+          </div>
+          <div class="menu-card" onclick="showPanel('changePasswordPanel')">
+            <i class="fas fa-user-shield"></i>
+            <h3>Security</h3>
+            <p>Change Admin Password</p>
+          </div>
+          <div class="menu-card" onclick="showPanel('pendingKeysPanel')">
+            <i class="fas fa-clock"></i>
+            <h3>Pending Keys</h3>
+            <p>Approve key requests</p>
+          </div>
+          <div class="menu-card" onclick="showPanel('paymentSettingsPanel')">
+            <i class="fas fa-mobile-alt"></i>
+            <h3>Payment Numbers</h3>
+            <p>bKash/Nagad settings</p>
+          </div>
+        </div>
+        <button class="btn btn-secondary" style="margin-top: 20px;" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="addServicePanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-plus"></i></div>
+        <div class="header-text">
+          <h2>Add Service</h2>
+          <p>Create new SMM service</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <form id="addServiceForm">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-tag"></i> Service Name</label>
+            <div class="input-wrapper">
+              <i class="fas fa-tag"></i>
+              <input type="text" id="serviceName" class="admin-input" placeholder="e.g., Instagram Followers" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-plug"></i> API Service ID (Optional)</label>
+            <div class="input-wrapper">
+              <i class="fas fa-plug"></i>
+              <input type="number" id="serviceApiId" class="admin-input" placeholder="e.g., 1234">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-folder"></i> Category</label>
+            <div class="input-wrapper">
+              <i class="fas fa-folder"></i>
+              <select id="serviceCategory" class="admin-input admin-select">
+                <option value="Facebook">Facebook</option>
+                <option value="Instagram">Instagram</option>
+                <option value="YouTube">YouTube</option>
+                <option value="TikTok">TikTok</option>
+                <option value="Twitter">Twitter</option>
+                <option value="Telegram">Telegram</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-dollar-sign"></i> Price per 1000</label>
+            <div class="input-wrapper">
+              <i class="fas fa-dollar-sign"></i>
+              <input type="number" id="servicePrice" class="admin-input" step="0.01" placeholder="e.g., 50" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-arrow-down"></i> Min Order</label>
+            <div class="input-wrapper">
+              <i class="fas fa-arrow-down"></i>
+              <input type="number" id="serviceMinOrder" class="admin-input" placeholder="e.g., 100" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-arrow-up"></i> Max Order</label>
+            <div class="input-wrapper">
+              <i class="fas fa-arrow-up"></i>
+              <input type="number" id="serviceMaxOrder" class="admin-input" placeholder="e.g., 10000" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+            <textarea id="serviceDesc" class="admin-input admin-textarea" placeholder="Service description..."></textarea>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="showPanel('menuPanel')">
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Add Service
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="apiSettingsPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-plug"></i></div>
+        <div class="header-text">
+          <h2>API Settings</h2>
+          <p>Configure SMM Mother Panel API</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <form id="apiSettingsForm">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-link"></i> API URL</label>
+            <div class="input-wrapper">
+              <i class="fas fa-link"></i>
+              <input type="url" id="apiUrl" class="admin-input" placeholder="https://motherpanel.com/api/v2" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-key"></i> API Key</label>
+            <div class="input-wrapper">
+              <i class="fas fa-key"></i>
+              <input type="text" id="apiKey" class="admin-input" placeholder="Your API Key" required>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="showPanel('menuPanel')">
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Save Settings
+            </button>
+          </div>
+        </form>
+        <div class="section-divider"></div>
+        <div class="section-title"><i class="fas fa-paper-plane"></i> Manual Order Send</div>
+        <div class="form-group">
+          <label class="form-label">Order ID (from this panel)</label>
+          <div class="input-wrapper">
+            <i class="fas fa-hashtag"></i>
+            <input type="text" id="manualOrderId" class="admin-input" placeholder="Enter Order ID">
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="sendOrderToApi()">
+          <i class="fas fa-share-square"></i> Send to Mother Panel
+        </button>
+        <div class="section-divider"></div>
+        <div class="section-title"><i class="fas fa-wallet"></i> API Balance Check</div>
+        <div id="apiBalanceDisplay" class="stat-card income" style="margin-bottom: 15px; padding: 15px;">
+          <div class="stat-label">Mother Panel Balance</div>
+          <div class="stat-number" id="motherPanelBalance">৳0.00</div>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="checkApiBalance()">
+          <i class="fas fa-sync"></i> Check Balance
+        </button>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="changePasswordPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-user-shield"></i></div>
+        <div class="header-text">
+          <h2>Change Password</h2>
+          <p>Update your admin credentials</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <form id="changePasswordForm">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-user"></i> New Username</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user"></i>
+              <input type="text" id="newUsername" class="admin-input" placeholder="New username" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-key"></i> New Password</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock"></i>
+              <input type="password" id="newPassword" class="admin-input" placeholder="New password" required>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="showPanel('menuPanel')">
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Update Credentials
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="servicesPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-list"></i></div>
+        <div class="header-text">
+          <h2>All Services</h2>
+          <p>Manage your services</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <div id="servicesList"></div>
+        <button class="btn btn-secondary" style="margin-top: 20px;" onclick="showPanel('menuPanel')">
+          <i class="fas fa-arrow-left"></i> Back to Menu
+        </button>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="keysPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-key"></i></div>
+        <div class="header-text">
+          <h2>API Keys</h2>
+          <p>Manage API keys with limits</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <button class="btn btn-primary" style="margin-bottom: 20px;" onclick="showPanel('addKeyPanel')">
+          <i class="fas fa-plus"></i> Add New Key
+        </button>
+        <div id="keysList"></div>
+        <button class="btn btn-secondary" style="margin-top: 20px;" onclick="showPanel('menuPanel')">
+          <i class="fas fa-arrow-left"></i> Back to Menu
+        </button>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="addKeyPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-key"></i></div>
+        <div class="header-text">
+          <h2>Add API Key</h2>
+          <p>Create new API key with limit</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <form id="addKeyForm">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-user"></i> Key Name / Owner</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user"></i>
+              <input type="text" id="keyName" class="admin-input" placeholder="e.g., Customer Name" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-wallet"></i> Balance / Limit (৳)</label>
+            <div class="input-wrapper">
+              <i class="fas fa-wallet"></i>
+              <input type="number" id="keyLimit" class="admin-input" step="0.01" placeholder="e.g., 1000" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-key"></i> API Key (Auto-generated)</label>
+            <div class="input-wrapper">
+              <i class="fas fa-key"></i>
+              <input type="text" id="keyValue" class="admin-input" readonly>
+            </div>
+            <button type="button" class="btn btn-secondary" style="margin-top: 10px;" onclick="generateKey()">
+              <i class="fas fa-sync"></i> Generate New Key
+            </button>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="showPanel('keysPanel')">
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Create Key
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="ordersPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-shopping-bag"></i></div>
+        <div class="header-text">
+          <h2>Orders</h2>
+          <p>Manage customer orders</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <div class="filter-tabs">
+          <span class="filter-tab active" onclick="filterOrders('all')">All</span>
+          <span class="filter-tab" onclick="filterOrders('pending')">Pending</span>
+          <span class="filter-tab" onclick="filterOrders('processing')">Processing</span>
+          <span class="filter-tab" onclick="filterOrders('completed')">Completed</span>
+          <span class="filter-tab" onclick="filterOrders('cancelled')">Cancelled</span>
+        </div>
+        <div id="ordersList"></div>
+        <button class="btn btn-secondary" style="margin-top: 20px;" onclick="showPanel('menuPanel')">
+          <i class="fas fa-arrow-left"></i> Back to Menu
+        </button>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="editServicePanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-edit"></i></div>
+        <div class="header-text">
+          <h2>Edit Service</h2>
+          <p>Update service details</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <form id="editServiceForm">
+          <input type="hidden" id="editServiceId">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-tag"></i> Service Name</label>
+            <div class="input-wrapper">
+              <i class="fas fa-tag"></i>
+              <input type="text" id="editServiceName" class="admin-input" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-plug"></i> API Service ID</label>
+            <div class="input-wrapper">
+              <i class="fas fa-plug"></i>
+              <input type="number" id="editServiceApiId" class="admin-input" placeholder="e.g., 1234">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-folder"></i> Category</label>
+            <div class="input-wrapper">
+              <i class="fas fa-folder"></i>
+              <select id="editServiceCategory" class="admin-input admin-select">
+                <option value="Facebook">Facebook</option>
+                <option value="Instagram">Instagram</option>
+                <option value="YouTube">YouTube</option>
+                <option value="TikTok">TikTok</option>
+                <option value="Twitter">Twitter</option>
+                <option value="Telegram">Telegram</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-dollar-sign"></i> Price per 1000</label>
+            <div class="input-wrapper">
+              <i class="fas fa-dollar-sign"></i>
+              <input type="number" id="editServicePrice" class="admin-input" step="0.01" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-arrow-down"></i> Min Order</label>
+            <div class="input-wrapper">
+              <i class="fas fa-arrow-down"></i>
+              <input type="number" id="editServiceMinOrder" class="admin-input" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-arrow-up"></i> Max Order</label>
+            <div class="input-wrapper">
+              <i class="fas fa-arrow-up"></i>
+              <input type="number" id="editServiceMaxOrder" class="admin-input" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+            <textarea id="editServiceDesc" class="admin-input admin-textarea"></textarea>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="showPanel('servicesPanel')">
+              <i class="fas fa-arrow-left"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Update
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="editKeyPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-edit"></i></div>
+        <div class="header-text">
+          <h2>Edit API Key</h2>
+          <p>Update key balance</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <form id="editKeyForm">
+          <input type="hidden" id="editKeyId">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-user"></i> Key Name / Owner</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user"></i>
+              <input type="text" id="editKeyName" class="admin-input" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-wallet"></i> Add Balance (৳)</label>
+            <div class="input-wrapper">
+              <i class="fas fa-wallet"></i>
+              <input type="number" id="addBalance" class="admin-input" step="0.01" placeholder="Amount to add">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-toggle-on"></i> Status</label>
+            <div class="input-wrapper">
+              <i class="fas fa-toggle-on"></i>
+              <select id="editKeyStatus" class="admin-input admin-select">
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="showPanel('keysPanel')">
+              <i class="fas fa-arrow-left"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Update
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="editOrderPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-edit"></i></div>
+        <div class="header-text">
+          <h2>Edit Order</h2>
+          <p>Update order progress details</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <form id="editOrderForm">
+          <input type="hidden" id="editOrderId">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-receipt"></i> Order ID</label>
+            <div class="input-wrapper">
+              <i class="fas fa-receipt"></i>
+              <input type="text" id="editOrderIdDisplay" class="admin-input" readonly>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-play"></i> Start Count</label>
+            <div class="input-wrapper">
+              <i class="fas fa-play"></i>
+              <input type="number" id="editStartCount" class="admin-input" placeholder="e.g., 1000">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-hourglass-half"></i> Remain Count</label>
+            <div class="input-wrapper">
+              <i class="fas fa-hourglass-half"></i>
+              <input type="number" id="editRemainCount" class="admin-input" placeholder="e.g., 500">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-info-circle"></i> Status</label>
+            <div class="input-wrapper">
+              <i class="fas fa-info-circle"></i>
+              <select id="editOrderStatus" class="admin-input admin-select">
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="showPanel('ordersPanel')">
+              <i class="fas fa-arrow-left"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Update Order
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="pendingKeysPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-clock"></i></div>
+        <div class="header-text">
+          <h2>Pending Key Requests</h2>
+          <p>Approve payment & activate keys</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <button class="btn btn-secondary" onclick="showPanel('menuPanel')" style="margin-bottom: 20px;">
+          <i class="fas fa-arrow-left"></i> Back to Menu
+        </button>
+        <div id="pendingKeysList"></div>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="paymentSettingsPanel">
+      <div class="panel-header">
+        <div class="header-icon"><i class="fas fa-mobile-alt"></i></div>
+        <div class="header-text">
+          <h2>Payment Numbers</h2>
+          <p>Configure bKash & Nagad numbers</p>
+        </div>
+      </div>
+      <div class="panel-content">
+        <button class="btn btn-secondary" onclick="showPanel('menuPanel')" style="margin-bottom: 20px;">
+          <i class="fas fa-arrow-left"></i> Back to Menu
+        </button>
+        <form id="paymentSettingsForm">
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-mobile-alt" style="color: #E2136E;"></i> bKash Number</label>
+            <div class="input-wrapper">
+              <i class="fas fa-mobile-alt" style="color: #E2136E;"></i>
+              <input type="tel" id="bkashNumber" class="admin-input" placeholder="01XXXXXXXXX" maxlength="11">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i class="fas fa-mobile-alt" style="color: #F6921E;"></i> Nagad Number</label>
+            <div class="input-wrapper">
+              <i class="fas fa-mobile-alt" style="color: #F6921E;"></i>
+              <input type="tel" id="nagadNumber" class="admin-input" placeholder="01XXXXXXXXX" maxlength="11">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Payment Numbers
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA5eRGoGPmJiYn0Ij4fmVEPfllzfBPXGqs",
+      authDomain: "admin-panel-7f213.firebaseapp.com",
+      databaseURL: "https://admin-panel-7f213-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "admin-panel-7f213",
+      storageBucket: "admin-panel-7f213.firebasestorage.app",
+      messagingSenderId: "457002341000",
+      appId: "1:457002341000:web:140bcba3bf808444d4c53d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const ADMIN_USER = 'admin';
+    let ADMIN_PASS = localStorage.getItem('adminPassword') || 'admin123';
+
+    let allOrders = [];
+    let currentOrderFilter = 'all';
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('pageLoader').classList.add('hidden');
+      }, 800);
+
+      if (localStorage.getItem('adminLoggedIn') === 'true') {
+        showPanel('menuPanel');
+        loadStats();
+      }
+
+      generateKey();
+    });
+
+    // document.getElementById('loginForm').addEventListener('submit', (e) => {
+    //   e.preventDefault();
+    //   const username = document.getElementById('username').value;
+    //   const password = document.getElementById('password').value;
+
+    //   if (username === ADMIN_USER && password === ADMIN_PASS) {
+    //     localStorage.setItem('adminLoggedIn', 'true');
+    //     Swal.fire({
+    //       icon: 'success',
+    //       title: 'Welcome!',
+    //       timer: 1500,
+    //       showConfirmButton: false
+    //     });
+    //     showPanel('menuPanel');
+    //     loadStats();
+    //   } else {
+    //     Swal.fire({ icon: 'error', title: 'Login Failed', text: 'Invalid credentials' });
+    //   }
+    // });
+
+    function logout() {
+      localStorage.removeItem('adminLoggedIn');
+      showPanel('loginPanel');
+    }
+
+    // Load API Settings
+    function loadApiSettings() {
+      db.ref('settings/smm_api').once('value', (snapshot) => {
+        const settings = snapshot.val();
+        if (settings) {
+          document.getElementById('apiUrl').value = settings.url || '';
+          document.getElementById('apiKey').value = settings.key || '';
+        }
+      });
+    }
+
+    // Save API Settings
+    document.getElementById('apiSettingsForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const settings = {
+        url: document.getElementById('apiUrl').value,
+        key: document.getElementById('apiKey').value,
+        updatedAt: Date.now()
+      };
+      db.ref('settings/smm_api').set(settings).then(() => {
+        Swal.fire({ icon: 'success', title: 'Settings Saved!', timer: 1500, showConfirmButton: false });
+      });
+    });
+
+    // Send Order to Mother Panel API
+    async function sendOrderToApi() {
+      const orderId = document.getElementById('manualOrderId').value.trim();
+      if (!orderId) {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'Please enter an Order ID' });
+        return;
+      }
+
+      // 1. Get API Settings
+      const apiSnap = await db.ref('settings/smm_api').once('value');
+      const apiSettings = apiSnap.val();
+      if (!apiSettings || !apiSettings.url || !apiSettings.key) {
+        Swal.fire({ icon: 'error', title: 'API Not Configured', text: 'Please configure API URL and Key first' });
+        return;
+      }
+
+      // 2. Get Order Details
+      const orderSnap = await db.ref('orders/' + orderId).once('value');
+      const order = orderSnap.val();
+      if (!order) {
+        Swal.fire({ icon: 'error', title: 'Not Found', text: 'Order ID not found in database' });
+        return;
+      }
+
+      // 3. Get Service Details to find API Service ID
+      let apiServiceId = order.service_id; // Try order direct first
+      if (!apiServiceId) {
+        const servicesSnap = await db.ref('services').once('value');
+        servicesSnap.forEach(s => {
+          if (s.val().name === order.service_name) {
+            apiServiceId = s.val().api_service_id;
+          }
+        });
+      }
+
+      if (!apiServiceId) {
+        Swal.fire({ icon: 'error', title: 'API ID Missing', text: 'This service does not have an API Service ID assigned' });
+        return;
+      }
+
+      Swal.fire({
+        title: 'Sending Order...',
+        text: 'Connecting to Mother Panel API',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+      });
+
+      try {
+        const params = new URLSearchParams();
+        params.append('key', apiSettings.key);
+        params.append('action', 'add');
+        params.append('service', apiServiceId);
+        params.append('link', order.link || '');
+        params.append('quantity', order.amount || '');
+
+        // Using a proxy to avoid CORS issues if needed, or ensuring proper headers
+        const response = await fetch(apiSettings.url, {
+          method: 'POST',
+          body: params
+        });
+
+        if (!response.ok) throw new Error('Network response was not ok');
+        const result = await response.json();
+
+        if (result.order) {
+          await db.ref('orders/' + orderId).update({
+            status: 'processing',
+            mother_panel_order_id: result.order,
+            api_response: result,
+            sent_to_api: true
+          });
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Order Sent!',
+            text: 'Mother Panel Order ID: ' + result.order,
+            confirmButtonColor: '#6200ea'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'API Error',
+            text: result.error || 'Failed to send order'
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Connection Error',
+          text: 'API error or CORS issue. Please make sure the API URL is correct and supports CORS, or contact support.'
+        });
+      }
+    }
+
+    // Change Password
+    document.getElementById('changePasswordForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newU = document.getElementById('newUsername').value;
+      const newP = document.getElementById('newPassword').value;
+
+      // Update in Firebase for persistence
+      db.ref('settings/admin_creds').set({
+        username: newU,
+        password: newP
+      }).then(() => {
+        // Also update local variables
+        // (Note: In a real app, you'd fetch these on login)
+        localStorage.setItem('adminUsername', newU);
+        localStorage.setItem('adminPassword', newP);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Updated!',
+          text: 'Admin credentials updated successfully',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          logout();
+        });
+      });
+    });
+
+    // Update login check to use Firebase creds if available
+    async function checkLogin(username, password) {
+      const snap = await db.ref('settings/admin_creds').once('value');
+      const creds = snap.val();
+
+      const validU = creds ? creds.username : 'admin';
+      const validP = creds ? creds.password : 'admin123';
+
+      if (username === validU && password === validP) {
+        localStorage.setItem('adminLoggedIn', 'true');
+        return true;
+      }
+      return false;
+    }
+
+    // Replace old login logic
+    document.getElementById('loginForm').removeEventListener('submit', null); // dummy
+    document.getElementById('loginForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+
+      if (await checkLogin(u, p)) {
+        Swal.fire({ icon: 'success', title: 'Welcome!', timer: 1500, showConfirmButton: false });
+        showPanel('menuPanel');
+        loadStats();
+      } else {
+        Swal.fire({ icon: 'error', title: 'Login Failed', text: 'Invalid credentials' });
+      }
+    };
+
+    function showPanel(panelId) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById(panelId).classList.remove('hidden');
+
+      if (panelId === 'servicesPanel') loadServices();
+      if (panelId === 'keysPanel') loadKeys();
+      if (panelId === 'ordersPanel') loadOrders();
+      if (panelId === 'apiSettingsPanel') loadApiSettings();
+    }
+
+    function loadStats() {
+      db.ref('services').once('value', (snapshot) => {
+        document.getElementById('totalServices').textContent = snapshot.numChildren();
+      });
+
+      db.ref('apiKeys').once('value', (snapshot) => {
+        document.getElementById('totalKeys').textContent = snapshot.numChildren();
+      });
+
+      db.ref('orders').once('value', (snapshot) => {
+        let total = 0;
+        let income = 0;
+        snapshot.forEach((child) => {
+          total++;
+          income += parseFloat(child.val().total) || 0;
+        });
+        document.getElementById('totalOrders').textContent = total;
+        document.getElementById('totalIncome').textContent = '৳' + income.toFixed(2);
+      });
+    }
+
+    function generateKey() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let key = 'SMM-';
+      for (let i = 0; i < 20; i++) {
+        key += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      document.getElementById('keyValue').value = key;
+    }
+
+    document.getElementById('addServiceForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const service = {
+        name: document.getElementById('serviceName').value,
+        category: document.getElementById('serviceCategory').value,
+        price: parseFloat(document.getElementById('servicePrice').value),
+        minOrder: parseInt(document.getElementById('serviceMinOrder').value),
+        maxOrder: parseInt(document.getElementById('serviceMaxOrder').value),
+        description: document.getElementById('serviceDesc').value,
+        api_service_id: document.getElementById('serviceApiId').value || '',
+        createdAt: Date.now()
+      };
+
+      db.ref('services').push(service).then(() => {
+        Swal.fire({ icon: 'success', title: 'Service Added!', timer: 1500, showConfirmButton: false });
+        document.getElementById('addServiceForm').reset();
+        showPanel('menuPanel');
+        loadStats();
+      });
+    });
+
+    function loadServices() {
+      const container = document.getElementById('servicesList');
+      container.innerHTML = '<p style="text-align: center; color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
+
+      db.ref('services').once('value', (snapshot) => {
+        container.innerHTML = '';
+        const services = [];
+        snapshot.forEach((child) => {
+          services.push({ id: child.key, ...child.val() });
+        });
+
+        if (services.length === 0) {
+          container.innerHTML = '<div class="empty-state"><i class="fas fa-list"></i><p>No services found</p></div>';
+          return;
+        }
+
+        const iconMap = {
+          'facebook': 'fab fa-facebook',
+          'instagram': 'fab fa-instagram',
+          'youtube': 'fab fa-youtube',
+          'tiktok': 'fab fa-tiktok',
+          'twitter': 'fab fa-twitter',
+          'telegram': 'fab fa-telegram'
+        };
+
+        services.forEach((s) => {
+          const cat = (s.category || '').toLowerCase();
+          const icon = iconMap[cat] || 'fas fa-bolt';
+          container.innerHTML += `
+            <div class="item-card">
+              <div class="item-header">
+                <div class="item-icon"><i class="${icon}"></i></div>
+                <div class="item-info">
+                  <div class="item-name">${s.name}</div>
+                  <div class="item-meta">
+                    <span><i class="fas fa-folder"></i> ${s.category}</span>
+                    <span><i class="fas fa-dollar-sign"></i> ৳${s.price}/1K</span>
+                  </div>
+                </div>
+              </div>
+              <div class="item-actions">
+                <button class="btn-edit" onclick="editService('${s.id}')">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn-delete" onclick="deleteService('${s.id}')">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function editService(id) {
+      db.ref('services/' + id).once('value', (snapshot) => {
+        const s = snapshot.val();
+        document.getElementById('editServiceId').value = id;
+        document.getElementById('editServiceName').value = s.name || '';
+        document.getElementById('editServiceApiId').value = s.api_service_id || '';
+        document.getElementById('editServiceCategory').value = s.category || 'Facebook';
+        document.getElementById('editServicePrice').value = s.price || '';
+        document.getElementById('editServiceMinOrder').value = s.minOrder || '';
+        document.getElementById('editServiceMaxOrder').value = s.maxOrder || '';
+        document.getElementById('editServiceDesc').value = s.description || '';
+        showPanel('editServicePanel');
+      });
+    }
+
+    document.getElementById('editServiceForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editServiceId').value;
+
+      const updates = {
+        name: document.getElementById('editServiceName').value,
+        api_service_id: document.getElementById('editServiceApiId').value || '',
+        category: document.getElementById('editServiceCategory').value,
+        price: parseFloat(document.getElementById('editServicePrice').value),
+        minOrder: parseInt(document.getElementById('editServiceMinOrder').value),
+        maxOrder: parseInt(document.getElementById('editServiceMaxOrder').value),
+        description: document.getElementById('editServiceDesc').value
+      };
+
+      db.ref('services/' + id).update(updates).then(() => {
+        Swal.fire({ icon: 'success', title: 'Updated!', timer: 1500, showConfirmButton: false });
+        showPanel('servicesPanel');
+      });
+    });
+
+    function deleteService(id) {
+      Swal.fire({
+        title: 'Delete Service?',
+        text: 'This action cannot be undone',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#f44336',
+        confirmButtonText: 'Delete'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          db.ref('services/' + id).remove().then(() => {
+            Swal.fire({ icon: 'success', title: 'Deleted!', timer: 1500, showConfirmButton: false });
+            loadServices();
+            loadStats();
+          });
+        }
+      });
+    }
+
+    document.getElementById('addKeyForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const keyData = {
+        name: document.getElementById('keyName').value,
+        key: document.getElementById('keyValue').value,
+        balance: parseFloat(document.getElementById('keyLimit').value),
+        usedLimit: 0,
+        active: true,
+        createdAt: Date.now()
+      };
+
+      db.ref('apiKeys').push(keyData).then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'API Key Created!',
+          html: `<p>Key: <code>${keyData.key}</code></p>`,
+          confirmButtonColor: '#6200ea'
+        });
+        document.getElementById('addKeyForm').reset();
+        generateKey();
+        showPanel('keysPanel');
+        loadStats();
+      });
+    });
+
+    function loadKeys() {
+      const container = document.getElementById('keysList');
+      container.innerHTML = '<p style="text-align: center; color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
+
+      db.ref('apiKeys').once('value', (snapshot) => {
+        container.innerHTML = '';
+        const keys = [];
+        snapshot.forEach((child) => {
+          keys.push({ id: child.key, ...child.val() });
+        });
+
+        if (keys.length === 0) {
+          container.innerHTML = '<div class="empty-state"><i class="fas fa-key"></i><p>No API keys found</p></div>';
+          return;
+        }
+
+        keys.forEach((k) => {
+          const balance = parseFloat(k.balance) || 0;
+          const used = parseFloat(k.usedLimit) || 0;
+          const total = balance + used;
+          const usedPercent = total > 0 ? (used / total * 100) : 0;
+
+          container.innerHTML += `
+            <div class="key-card">
+              <div class="key-header">
+                <div>
+                  <div style="font-weight: 600; color: var(--text); margin-bottom: 5px;">${k.name}</div>
+                  <div class="key-value">${k.key}</div>
+                </div>
+                <span class="key-status ${k.active ? 'active' : 'inactive'}">${k.active ? 'Active' : 'Inactive'}</span>
+              </div>
+              <div class="key-details">
+                <div class="key-detail">
+                  <div class="key-detail-label">Balance</div>
+                  <div class="key-detail-value">৳${balance.toFixed(2)}</div>
+                </div>
+                <div class="key-detail">
+                  <div class="key-detail-label">Used</div>
+                  <div class="key-detail-value">৳${used.toFixed(2)}</div>
+                </div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${usedPercent}%"></div>
+              </div>
+              <div class="item-actions" style="margin-top: 15px;">
+                <button class="btn-edit" onclick="editKey('${k.id}')">
+                  <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn-delete" onclick="deleteKey('${k.id}')">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    let currentEditKeyBalance = 0;
+
+    function editKey(id) {
+      db.ref('apiKeys/' + id).once('value', (snapshot) => {
+        const k = snapshot.val();
+        currentEditKeyBalance = parseFloat(k.balance) || 0;
+        document.getElementById('editKeyId').value = id;
+        document.getElementById('editKeyName').value = k.name || '';
+        document.getElementById('addBalance').value = '';
+        document.getElementById('editKeyStatus').value = k.active ? 'true' : 'false';
+        showPanel('editKeyPanel');
+      });
+    }
+
+    document.getElementById('editKeyForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editKeyId').value;
+      const addBal = parseFloat(document.getElementById('addBalance').value) || 0;
+
+      const updates = {
+        name: document.getElementById('editKeyName').value,
+        balance: currentEditKeyBalance + addBal,
+        active: document.getElementById('editKeyStatus').value === 'true'
+      };
+
+      db.ref('apiKeys/' + id).update(updates).then(() => {
+        Swal.fire({ icon: 'success', title: 'Updated!', timer: 1500, showConfirmButton: false });
+        showPanel('keysPanel');
+      });
+    });
+
+    function deleteKey(id) {
+      Swal.fire({
+        title: 'Delete API Key?',
+        text: 'This action cannot be undone',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#f44336',
+        confirmButtonText: 'Delete'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          db.ref('apiKeys/' + id).remove().then(() => {
+            Swal.fire({ icon: 'success', title: 'Deleted!', timer: 1500, showConfirmButton: false });
+            loadKeys();
+            loadStats();
+          });
+        }
+      });
+    }
+
+    function loadOrders() {
+      const container = document.getElementById('ordersList');
+      container.innerHTML = '<p style="text-align: center; color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
+
+      db.ref('orders').once('value', (snapshot) => {
+        allOrders = [];
+        snapshot.forEach((child) => {
+          allOrders.push({ id: child.key, ...child.val() });
+        });
+        allOrders.reverse();
+        renderOrders();
+      });
+    }
+
+    function filterOrders(status) {
+      currentOrderFilter = status;
+      document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+      event.target.classList.add('active');
+      renderOrders();
+    }
+
+    function renderOrders() {
+      const container = document.getElementById('ordersList');
+      container.innerHTML = '';
+
+      let filtered = allOrders;
+      if (currentOrderFilter !== 'all') {
+        filtered = allOrders.filter(o => (o.status || 'pending') === currentOrderFilter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No orders found</p></div>';
+        return;
+      }
+
+      filtered.forEach((o) => {
+        const status = o.status || 'pending';
+        const startCount = o.start_count || '-';
+        const remainCount = o.remain_count || '-';
+        container.innerHTML += `
+          <div class="order-item">
+            <div class="order-header">
+              <div>
+                <div class="order-id"><i class="fas fa-receipt"></i> ${o.order_id || o.id}</div>
+                <div class="order-time">${o.time || 'N/A'}</div>
+              </div>
+              <span class="order-total">৳${o.total || '0'}</span>
+            </div>
+            <div class="order-details">
+              <div class="order-detail"><i class="fas fa-list"></i> ${o.service_name || 'Unknown Service'}</div>
+              <div class="order-detail"><i class="fas fa-link"></i> ${o.link || 'N/A'}</div>
+              <div class="order-detail"><i class="fas fa-sort-numeric-up"></i> Amount: ${o.amount || 'N/A'}</div>
+              <div class="order-detail"><i class="fas fa-play"></i> Start: ${startCount} | <i class="fas fa-hourglass-half"></i> Remain: ${remainCount}</div>
+            </div>
+            <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn-edit" onclick="editOrder('${o.id}')" style="flex: 1;">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <button class="btn-delete" onclick="deleteOrder('${o.id}')" style="flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 0.85em; font-weight: 500; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(244, 67, 54, 0.2); color: var(--danger);">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+              <div class="status-buttons" style="flex: 2;">
+                <button class="status-btn pending ${status === 'pending' ? 'active' : ''}" onclick="updateOrderStatus('${o.id}', 'pending')">Pending</button>
+                <button class="status-btn processing ${status === 'processing' ? 'active' : ''}" onclick="updateOrderStatus('${o.id}', 'processing')">Processing</button>
+                <button class="status-btn completed ${status === 'completed' ? 'active' : ''}" onclick="updateOrderStatus('${o.id}', 'completed')">Completed</button>
+                <button class="status-btn cancelled ${status === 'cancelled' ? 'active' : ''}" onclick="updateOrderStatus('${o.id}', 'cancelled')">Cancelled</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function editOrder(id) {
+      db.ref('orders/' + id).once('value', (snapshot) => {
+        const o = snapshot.val();
+        document.getElementById('editOrderId').value = id;
+        document.getElementById('editOrderIdDisplay').value = o.order_id || id;
+        document.getElementById('editStartCount').value = o.start_count || '';
+        document.getElementById('editRemainCount').value = o.remain_count || '';
+        document.getElementById('editOrderStatus').value = o.status || 'pending';
+        showPanel('editOrderPanel');
+      });
+    }
+
+    document.getElementById('editOrderForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editOrderId').value;
+
+      const updates = {
+        start_count: parseInt(document.getElementById('editStartCount').value) || 0,
+        remain_count: parseInt(document.getElementById('editRemainCount').value) || 0,
+        status: document.getElementById('editOrderStatus').value
+      };
+
+      db.ref('orders/' + id).update(updates).then(() => {
+        Swal.fire({ icon: 'success', title: 'Order Updated!', timer: 1500, showConfirmButton: false });
+        showPanel('ordersPanel');
+      });
+    });
+
+    async function updateOrderStatus(id, status) {
+      if (status === 'cancelled') {
+        const confirmRefund = await Swal.fire({
+          title: 'Cancel & Refund?',
+          text: 'Are you sure you want to cancel this order and refund the amount to the API key?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#f44336',
+          confirmButtonText: 'Yes, Refund'
+        });
+
+        if (!confirmRefund.isConfirmed) return;
+
+        // 1. Get Order Details
+        const orderSnap = await db.ref('orders/' + id).once('value');
+        const order = orderSnap.val();
+        
+        if (!order) return;
+        if (order.refunded) {
+          Swal.fire({ icon: 'info', title: 'Already Refunded', text: 'This order has already been refunded.' });
+          return;
+        }
+
+        const refundAmount = parseFloat(order.total) || 0;
+        const apiKey = order.key;
+
+        if (apiKey && refundAmount > 0) {
+          // 2. Find and Update API Key Balance
+          const keysSnap = await db.ref('apiKeys').once('value');
+          let keyId = null;
+          let currentBalance = 0;
+          let currentUsed = 0;
+
+          keysSnap.forEach(k => {
+            if (k.val().key === apiKey) {
+              keyId = k.key;
+              currentBalance = parseFloat(k.val().balance) || 0;
+              currentUsed = parseFloat(k.val().usedLimit) || 0;
+            }
+          });
+
+          if (keyId) {
+            await db.ref('apiKeys/' + keyId).update({
+              balance: currentBalance + refundAmount,
+              usedLimit: Math.max(0, currentUsed - refundAmount)
+            });
+          }
+        }
+        
+        await db.ref('orders/' + id).update({ status: 'cancelled', refunded: true });
+        Swal.fire({ icon: 'success', title: 'Order Cancelled & Refunded!', timer: 2000, showConfirmButton: false });
+      } else {
+        await db.ref('orders/' + id + '/status').set(status);
+        Swal.fire({ icon: 'success', title: 'Status Updated!', timer: 1000, showConfirmButton: false });
+      }
+      loadOrders();
+      loadStats();
+    }
+
+    // Check Mother Panel API Balance
+    async function checkApiBalance() {
+      // 1. Get API Settings
+      const apiSnap = await db.ref('settings/smm_api').once('value');
+      const apiSettings = apiSnap.val();
+      if (!apiSettings || !apiSettings.url || !apiSettings.key) {
+        Swal.fire({ icon: 'error', title: 'API Not Configured', text: 'Please configure API URL and Key first' });
+        return;
+      }
+
+      Swal.fire({
+        title: 'Checking Balance...',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+      });
+
+      try {
+        const params = new URLSearchParams();
+        params.append('key', apiSettings.key);
+        params.append('action', 'balance');
+
+        const response = await fetch(apiSettings.url, {
+          method: 'POST',
+          body: params
+        });
+
+        const result = await response.json();
+
+        if (result.balance) {
+          document.getElementById('motherPanelBalance').textContent = result.currency + ' ' + result.balance;
+          Swal.fire({
+            icon: 'success',
+            title: 'Balance Updated!',
+            text: 'Current Balance: ' + result.currency + ' ' + result.balance,
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'API Error',
+            text: result.error || 'Failed to fetch balance'
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Network Error',
+          text: 'Could not connect to Mother Panel API'
+        });
+      }
+    }
+
+    // Delete Order
+    function deleteOrder(id) {
+      Swal.fire({
+        title: 'Delete Order?',
+        text: 'This action cannot be undone',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#f44336',
+        confirmButtonText: 'Delete'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          db.ref('orders/' + id).remove().then(() => {
+            Swal.fire({ icon: 'success', title: 'Order Deleted!', timer: 1500, showConfirmButton: false });
+            loadOrders();
+            loadStats();
+          });
+        }
+      });
+    }
+
+    // Pending Keys Functions
+    function loadPendingKeys() {
+      const container = document.getElementById('pendingKeysList');
+      container.innerHTML = '<p style="text-align: center; color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Loading...</p>';
+
+      db.ref('pendingKeys').once('value', (snapshot) => {
+        container.innerHTML = '';
+        const pending = [];
+        snapshot.forEach((child) => {
+          pending.push({ id: child.key, ...child.val() });
+        });
+
+        if (pending.length === 0) {
+          container.innerHTML = '<div class="empty-state"><i class="fas fa-check-circle"></i><p>No pending requests</p></div>';
+          return;
+        }
+
+        pending.reverse();
+        pending.forEach((p) => {
+          const methodColor = p.paymentMethod === 'bkash' ? '#E2136E' : '#F6921E';
+          const whatsappNum = p.whatsapp ? '88' + p.whatsapp : '';
+          const whatsappMsg = encodeURIComponent('আপনার API Key: ' + p.key + '\n\nBalance: ৳' + p.amount + '\n\nধন্যবাদ!');
+          container.innerHTML += `
+            <div class="item-card" style="margin-bottom: 15px;">
+              <div class="item-header">
+                <div class="item-icon" style="background: ${methodColor};"><i class="fas fa-mobile-alt"></i></div>
+                <div class="item-info">
+                  <div class="item-name">${p.name || 'Unknown'}</div>
+                  <div class="item-meta">
+                    <span><i class="fas fa-phone"></i> ${p.phone}</span>
+                    <span><i class="fas fa-wallet"></i> ৳${p.amount}</span>
+                  </div>
+                </div>
+              </div>
+              <div style="padding: 15px 0; border-top: 1px solid var(--border); margin-top: 10px;">
+                <p style="margin: 5px 0; color: var(--text-muted);"><i class="fas fa-receipt"></i> TrxID: <strong style="color: var(--text);">${p.trxId}</strong></p>
+                <p style="margin: 5px 0; color: var(--text-muted);"><i class="fas fa-key"></i> Key: <span style="font-size: 0.85em; color: var(--primary);">${p.key}</span></p>
+                <p style="margin: 5px 0; color: var(--text-muted);"><i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp: <strong style="color: var(--text);">${p.whatsapp || 'N/A'}</strong></p>
+                <p style="margin: 5px 0; color: var(--text-muted);"><i class="fas fa-clock"></i> ${p.time || 'N/A'}</p>
+              </div>
+              <div class="item-actions">
+                <button class="btn-edit" onclick="approvePendingKey('${p.id}')" style="background: #4caf50;">
+                  <i class="fas fa-check"></i> Approve
+                </button>
+                ${p.whatsapp ? `<a href="https://wa.me/${whatsappNum}?text=${whatsappMsg}" target="_blank" class="btn-edit" style="background: #25D366; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                  <i class="fab fa-whatsapp"></i> Send Key
+                </a>` : ''}
+                <button class="btn-delete" onclick="rejectPendingKey('${p.id}')">
+                  <i class="fas fa-times"></i> Reject
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function approvePendingKey(id) {
+      db.ref('pendingKeys/' + id).once('value', (snapshot) => {
+        const p = snapshot.val();
+        if (!p) return;
+
+        const keyData = {
+          key: p.key,
+          name: p.name,
+          balance: p.amount,
+          usedLimit: 0,
+          active: true,
+          phone: p.phone,
+          createdAt: Date.now()
+        };
+
+        db.ref('apiKeys').push(keyData).then(() => {
+          db.ref('pendingKeys/' + id).remove().then(() => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Key Approved!',
+              text: 'API Key has been activated',
+              timer: 1500,
+              showConfirmButton: false
+            });
+            loadPendingKeys();
+            loadStats();
+          });
+        });
+      });
+    }
+
+    function rejectPendingKey(id) {
+      Swal.fire({
+        title: 'Reject Request?',
+        text: 'This will delete the pending request',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#f44336',
+        confirmButtonText: 'Reject'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          db.ref('pendingKeys/' + id).remove().then(() => {
+            Swal.fire({ icon: 'success', title: 'Request Rejected!', timer: 1500, showConfirmButton: false });
+            loadPendingKeys();
+          });
+        }
+      });
+    }
+
+    // Payment Settings Functions
+    function loadPaymentSettings() {
+      db.ref('settings/payment').once('value', (snapshot) => {
+        const settings = snapshot.val() || {};
+        document.getElementById('bkashNumber').value = settings.bkash || '';
+        document.getElementById('nagadNumber').value = settings.nagad || '';
+      });
+    }
+
+    document.getElementById('paymentSettingsForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const bkash = document.getElementById('bkashNumber').value.trim();
+      const nagad = document.getElementById('nagadNumber').value.trim();
+
+      db.ref('settings/payment').set({
+        bkash: bkash,
+        nagad: nagad
+      }).then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Saved!',
+          text: 'Payment numbers updated',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      });
+    });
+
+    // Update showPanel to load data for new panels
+    const originalShowPanel = showPanel;
+    showPanel = function(panelId) {
+      originalShowPanel(panelId);
+      if (panelId === 'pendingKeysPanel') loadPendingKeys();
+      if (panelId === 'paymentSettingsPanel') loadPaymentSettings();
+    };
+  </script>
+</body>
+</html>
