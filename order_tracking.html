@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Tracker</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%234CAF50%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><rect x=%228%22 y=%225%22 width=%228%22 height=%224%22 rx=%221%22 ry=%221%22/><path d=%22M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2%22/><path d=%22m9 14 2 2 4-4%22/></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #6366f1; --secondary: #0ea5e9;
+      --border: #1e293b; --border2: #334155;
+      --text: #f1f5f9; --muted: #64748b; --muted2: #94a3b8;
+      --bg: #060b18; --card: #0d1526; --card2: #111827;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 10% 0%, rgba(99,102,241,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 90% 100%, rgba(14,165,233,0.08) 0%, transparent 70%);
+    }
+
+    /* HEADER */
+    header { background: rgba(13,21,38,0.95); border-bottom: 1px solid var(--border); padding: 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
+    .header-inner { max-width: 1280px; margin: auto; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-size: 1.25rem; font-weight: 800; background: linear-gradient(135deg, #818cf8, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.3px; }
+    .logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #6366f1, #0ea5e9); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; box-shadow: 0 0 14px rgba(99,102,241,0.4); flex-shrink: 0; }
+    .logo-icon i { color: #fff !important; -webkit-text-fill-color: #fff !important; background: none !important; -webkit-background-clip: unset !important; }
+    .live-dot { display: flex; align-items: center; gap: 6px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); color: #34d399; padding: 4px 10px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.05em; }
+    .live-dot span { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; animation: livePulse 2s infinite; flex-shrink: 0; }
+    @keyframes livePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+    .container { max-width: 1280px; margin: auto; padding: 32px 28px; }
+
+    /* LOADER */
+    #loader { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 55vh; gap: 14px; }
+    .spinner { width: 44px; height: 44px; border: 3px solid rgba(99,102,241,0.2); border-top-color: #6366f1; border-radius: 50%; animation: spin 0.75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* DASHBOARD HEADER */
+    .dash-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+    .dash-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.4px; }
+    .dash-title span { background: linear-gradient(135deg, #818cf8, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .dash-sub { color: var(--muted2); font-size: 0.85rem; margin-top: 3px; }
+
+    /* PROFILE ROW */
+    .profile-row { display: flex; align-items: center; gap: 16px; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(14,165,233,0.05)); border: 1px solid rgba(99,102,241,0.18); border-radius: 18px; padding: 20px 24px; margin-bottom: 24px; position: relative; overflow: hidden; }
+    .profile-row::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #6366f1, #0ea5e9, #10b981, #f59e0b); }
+    .avatar { width: 64px; height: 64px; flex-shrink: 0; background: linear-gradient(135deg, #6366f1, #0ea5e9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; color: #fff; box-shadow: 0 0 24px rgba(99,102,241,0.45); border: 2px solid rgba(99,102,241,0.4); }
+    .profile-details { flex: 1; }
+    .profile-details h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 5px; }
+    .profile-meta { display: flex; flex-wrap: wrap; gap: 14px; }
+    .profile-meta-item { display: flex; align-items: center; gap: 6px; color: var(--muted2); font-size: 0.82rem; }
+    .profile-meta-item i { color: #6366f1; font-size: 0.78rem; }
+    .joined-badge { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25); color: #a5b4fc; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; margin-left: auto; white-space: nowrap; }
+
+    /* STATS GRID */
+    .stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 28px; }
+    @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 640px)  { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px 16px 16px; position: relative; overflow: hidden; transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s; cursor: default; }
+    .stat-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; opacity: 0; transition: opacity 0.25s; }
+    .stat-card:hover { transform: translateY(-4px); }
+    .stat-card:hover::after { opacity: 1; }
+    .stat-card.c-total { --accent: #818cf8; } .stat-card.c-done { --accent: #34d399; }
+    .stat-card.c-prog  { --accent: #60a5fa; } .stat-card.c-pend { --accent: #fbbf24; }
+    .stat-card.c-paid  { --accent: #a78bfa; } .stat-card.c-spent{ --accent: #38bdf8; }
+    .stat-card:hover { border-color: var(--accent); box-shadow: 0 6px 28px rgba(0,0,0,0.3), 0 0 0 1px var(--accent); }
+    .stat-card::after { background: var(--accent); }
+    .stat-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .stat-icon-wrap { width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 1rem; border: 1px solid rgba(255,255,255,0.07); color: var(--accent); }
+    .stat-trend { font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; color: var(--accent); background: rgba(255,255,255,0.05); }
+    .stat-value { font-size: 1.55rem; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); line-height: 1; }
+    .stat-label { font-size: 0.73rem; font-weight: 500; color: var(--muted2); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* SECTION HEADER */
+    .section-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+    .section-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .section-title i { color: #6366f1; }
+    .section-count { background: rgba(99,102,241,0.12); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.2); border-radius: 20px; padding: 2px 10px; font-size: 0.73rem; font-weight: 700; }
+
+    /* FILTER TABS */
+    .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ftab { display: flex; align-items: center; gap: 5px; padding: 5px 13px; border-radius: 20px; border: 1px solid var(--border2); background: transparent; color: var(--muted2); font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .ftab:hover { border-color: #6366f1; color: #a5b4fc; }
+    .ftab.active { background: #6366f1; border-color: #6366f1; color: #fff; box-shadow: 0 0 14px rgba(99,102,241,0.4); }
+    .ftab .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+    /* TABLE */
+    .table-wrapper { background: var(--card); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; box-shadow: 0 4px 40px rgba(0,0,0,0.3); }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 1060px; }
+    .start-count-cell { font-weight: 600; font-size: 0.88rem; color: #a5b4fc; }
+    .start-count-sub  { font-size: 0.69rem; color: var(--muted); margin-top: 2px; }
+    thead tr { background: rgba(99,102,241,0.06); border-bottom: 1px solid var(--border); }
+    thead th { padding: 13px 16px; text-align: left; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid rgba(30,41,59,0.7); transition: background 0.15s; cursor: pointer; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(99,102,241,0.06); }
+    tbody td { padding: 13px 16px; font-size: 0.875rem; vertical-align: middle; }
+    .serial-num { width: 28px; height: 28px; background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.22); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.76rem; font-weight: 700; color: #818cf8; }
+    .order-id-txt { font-weight: 600; font-size: 0.82rem; color: #cbd5e1; }
+    .link-cell a { color: #38bdf8; text-decoration: none; display: flex; align-items: center; gap: 5px; max-width: 165px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.81rem; transition: color 0.15s; }
+    .link-cell a:hover { color: #7dd3fc; }
+    .link-cell a i { font-size: 0.65rem; flex-shrink: 0; }
+    .svc-cell { display: flex; align-items: center; gap: 9px; }
+    .svc-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+    .svc-name { font-weight: 500; font-size: 0.85rem; }
+    .qty-num { font-weight: 700; font-size: 0.9rem; }
+    .pbar { width: 80px; height: 4px; background: var(--border2); border-radius: 4px; margin-top: 5px; }
+    .pbar-fill { height: 4px; border-radius: 4px; background: linear-gradient(90deg, #6366f1, #38bdf8); }
+    .qty-sub { font-size: 0.69rem; color: var(--muted); margin-top: 3px; }
+    .remain-num { font-weight: 700; font-size: 0.9rem; }
+    .charge-num { font-weight: 700; color: #4ade80; font-size: 0.9rem; }
+    .date-txt { color: var(--muted2); font-size: 0.78rem; white-space: nowrap; }
+
+    /* STATUS BADGES */
+    .sbadge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; white-space: nowrap; border: 1px solid transparent; }
+    .sbadge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .s-completed { background: rgba(16,185,129,0.12); color: #34d399; border-color: rgba(16,185,129,0.25); }
+    .s-completed .sbadge-dot { background: #10b981; box-shadow: 0 0 6px #10b981; }
+    .s-progress { background: rgba(96,165,250,0.12); color: #60a5fa; border-color: rgba(96,165,250,0.25); }
+    .s-progress .sbadge-dot { background: #3b82f6; box-shadow: 0 0 6px #3b82f6; animation: blink 1.4s infinite; }
+    .s-pending { background: rgba(251,191,36,0.12); color: #fbbf24; border-color: rgba(251,191,36,0.25); }
+    .s-pending .sbadge-dot { background: #f59e0b; }
+    .s-cancelled { background: rgba(239,68,68,0.12); color: #f87171; border-color: rgba(239,68,68,0.25); }
+    .s-cancelled .sbadge-dot { background: #ef4444; }
+    .s-partial { background: rgba(251,146,60,0.12); color: #fb923c; border-color: rgba(251,146,60,0.25); }
+    .s-partial .sbadge-dot { background: #f97316; box-shadow: 0 0 6px #f97316; animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+    /* SUMMARY BAR */
+    .summary-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 0; background: var(--card); border: 1px solid var(--border); border-radius: 16px; margin-top: 16px; overflow: hidden; }
+    .sum-item { flex: 1; min-width: 130px; padding: 16px 20px; text-align: center; border-right: 1px solid var(--border); transition: background 0.2s; }
+    .sum-item:last-child { border-right: none; }
+    .sum-item:hover { background: rgba(99,102,241,0.04); }
+    .sum-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+    .sum-val { font-size: 1rem; font-weight: 800; }
+
+    .empty-state { text-align: center; padding: 56px 20px; color: var(--muted); }
+    .empty-state i { font-size: 2.8rem; display: block; margin-bottom: 14px; color: var(--border2); }
+    .empty-state p { font-size: 0.9rem; }
+
+    footer { text-align: center; padding: 22px; color: var(--muted); font-size: 0.78rem; border-top: 1px solid var(--border); margin-top: 40px; }
+    footer strong { color: #818cf8; }
+
+    .hidden { display: none !important; }
+    .fade-in { animation: fadeUp 0.45s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── ORDER DETAIL MODAL ── */
+    .od-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.78); backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; z-index:9999; padding:16px; }
+    .od-overlay.show { display:flex; }
+    .od-modal { background:var(--card); border:1px solid var(--border2); border-radius:22px; width:100%; max-width:520px; max-height:92vh; overflow-y:auto; box-shadow:0 40px 80px rgba(0,0,0,0.65); position:relative; animation:fadeUp 0.3s ease both; }
+    .od-top-bar { height:3px; background:linear-gradient(90deg,#6366f1,#0ea5e9,#10b981,#f59e0b); border-radius:22px 22px 0 0; }
+    .od-body { padding:26px 28px 30px; }
+    .od-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:22px; gap:12px; }
+    .od-title { font-size:1.05rem; font-weight:800; letter-spacing:-0.2px; }
+    .od-sub { color:var(--muted2); font-size:0.78rem; margin-top:4px; }
+    .od-close { background:rgba(255,255,255,0.06); border:1px solid var(--border2); color:var(--muted2); width:32px; height:32px; border-radius:9px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.15s; }
+    .od-close:hover { background:rgba(255,255,255,0.13); color:var(--text); }
+    .od-svc-row { display:flex; align-items:center; gap:13px; margin-bottom:20px; padding:14px 16px; background:rgba(255,255,255,0.025); border:1px solid var(--border); border-radius:14px; }
+    .od-svc-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.15rem; flex-shrink:0; }
+    .od-svc-info { flex:1; min-width:0; }
+    .od-svc-name { font-weight:700; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .od-order-id { color:var(--muted2); font-size:0.76rem; margin-top:3px; }
+    .od-grid { display:grid; grid-template-columns:1fr 1fr; gap:11px; margin-bottom:14px; }
+    .od-field { background:rgba(255,255,255,0.022); border:1px solid var(--border); border-radius:12px; padding:13px 15px; }
+    .od-field-label { font-size:0.67rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:7px; }
+    .od-field-value { font-size:1rem; font-weight:800; line-height:1; }
+    .od-pbar-wrap { margin-top:8px; }
+    .od-pbar { width:100%; height:5px; background:var(--border2); border-radius:4px; overflow:hidden; }
+    .od-pbar-fill { height:5px; border-radius:4px; background:linear-gradient(90deg,#6366f1,#38bdf8); }
+    .od-pct { font-size:0.68rem; color:var(--muted2); margin-top:4px; }
+    .od-link-row { display:flex; align-items:center; gap:10px; padding:12px 16px; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.15); border-radius:12px; margin-bottom:14px; }
+    .od-link-row i { color:#38bdf8; font-size:0.82rem; flex-shrink:0; }
+    .od-link-anchor { color:#38bdf8; font-size:0.8rem; text-decoration:none; flex:1; word-break:break-all; line-height:1.4; }
+    .od-link-anchor:hover { color:#7dd3fc; }
+    .od-note { background:linear-gradient(135deg, rgba(99,102,241,0.08), rgba(14,165,233,0.05)); border:1px solid rgba(99,102,241,0.2); border-radius:14px; padding:16px 18px; margin-top:4px; }
+    .od-note-hdr { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+    .od-note-hdr i { color:#818cf8; font-size:0.82rem; }
+    .od-note-hdr span { font-size:0.7rem; font-weight:700; color:#a5b4fc; text-transform:uppercase; letter-spacing:0.07em; }
+    .od-note-text { color:var(--muted2); font-size:0.875rem; line-height:1.7; white-space:pre-wrap; }
+
+    @media (max-width: 640px) {
+      .container { padding: 16px; }
+      .profile-row { flex-direction: column; align-items: flex-start; }
+      .joined-badge { margin-left: 0; }
+      .summary-bar { flex-direction: column; }
+      .sum-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .sum-item:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon"><i class="fas fa-clipboard-list"></i></div>
+      Order Tracker
+    </div>
+    <div class="live-dot"><span></span> LIVE TRACKING</div>
+  </div>
+</header>
+
+<div class="container">
+  <div id="loader">
+    <div class="spinner"></div>
+    <p style="color:var(--muted2); font-size:0.85rem; margin-top:4px;">Loading your data...</p>
+  </div>
+
+  <div id="content" class="hidden">
+    <div class="dash-header fade-in">
+      <div>
+        <div class="dash-title">Order <span>Dashboard</span></div>
+        <div class="dash-sub">Track all your orders in real time</div>
+      </div>
+    </div>
+
+    <!-- PROFILE ROW -->
+    <div class="profile-row fade-in">
+      <div class="avatar" id="avatarText"></div>
+      <div class="profile-details">
+        <h2 id="custName"></h2>
+        <div class="profile-meta">
+          <div class="profile-meta-item"><i class="fas fa-envelope"></i><span id="custEmail"></span></div>
+          <div class="profile-meta-item"><i class="fas fa-phone"></i><span id="custPhone"></span></div>
+        </div>
+      </div>
+      <div class="joined-badge"><i class="fas fa-calendar-check" style="margin-right:5px;"></i>Joined: <span id="custJoined"></span></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid fade-in">
+      <div class="stat-card c-total">
+        <div class="stat-top"><div class="stat-icon-wrap"><i class="fas fa-layer-group"></i></div><div class="stat-trend">ALL</div></div>
+        <div class="stat-value" id="statTotal"></div><div class="stat-label">Total Orders</div>
+      </div>
+      <div class="stat-card c-done">
+        <div class="stat-top"><div class="stat-icon-wrap"><i class="fas fa-circle-check"></i></div><div class="stat-trend">DONE</div></div>
+        <div class="stat-value" id="statCompleted"></div><div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-card c-prog">
+        <div class="stat-top"><div class="stat-icon-wrap"><i class="fas fa-spinner"></i></div><div class="stat-trend">ACTIVE</div></div>
+        <div class="stat-value" id="statProgress"></div><div class="stat-label">In Progress</div>
+      </div>
+      <div class="stat-card c-pend">
+        <div class="stat-top"><div class="stat-icon-wrap"><i class="fas fa-clock"></i></div><div class="stat-trend">WAIT</div></div>
+        <div class="stat-value" id="statPending"></div><div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-card c-paid">
+        <div class="stat-top"><div class="stat-icon-wrap"><i class="fas fa-wallet"></i></div><div class="stat-trend">PAID</div></div>
+        <div class="stat-value" id="statBalance"></div><div class="stat-label">Paid Amount</div>
+      </div>
+      <div class="stat-card c-spent">
+        <div class="stat-top"><div class="stat-icon-wrap"><i class="fas fa-coins"></i></div><div class="stat-trend">TOTAL</div></div>
+        <div class="stat-value" id="statSpent"></div><div class="stat-label">Total Spent</div>
+      </div>
+    </div>
+
+    <!-- ORDER SECTION -->
+    <div class="section-header fade-in">
+      <div class="section-title">
+        <i class="fas fa-list-ul"></i> Order History
+        <span class="section-count" id="orderCount"></span>
+      </div>
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="filterOrders('All',this)"><span class="dot" style="background:#818cf8;"></span> All</button>
+        <button class="ftab" onclick="filterOrders('Completed',this)"><span class="dot" style="background:#10b981;"></span> Completed</button>
+        <button class="ftab" onclick="filterOrders('In Progress',this)"><span class="dot" style="background:#3b82f6; box-shadow:0 0 5px #3b82f6;"></span> In Progress</button>
+        <button class="ftab" onclick="filterOrders('Pending',this)"><span class="dot" style="background:#f59e0b;"></span> Pending</button>
+        <button class="ftab" onclick="filterOrders('Partial',this)"><span class="dot" style="background:#f97316;"></span> Partial</button>
+        <button class="ftab" onclick="filterOrders('Cancelled',this)"><span class="dot" style="background:#ef4444;"></span> Cancelled</button>
+      </div>
+    </div>
+
+    <div class="table-wrapper fade-in">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Order ID</th><th>Link</th><th>Service</th>
+              <th>Start Count</th><th>Quantity</th><th>Remains</th>
+              <th>Charge</th><th>Date</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="orderTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="summary-bar fade-in">
+      <div class="sum-item"><div class="sum-label">Total Orders</div><div class="sum-val" id="sumTotal" style="color:#818cf8;"></div></div>
+      <div class="sum-item"><div class="sum-label">Total Quantity</div><div class="sum-val" id="sumQty" style="color:#38bdf8;"></div></div>
+      <div class="sum-item"><div class="sum-label">Total Remains</div><div class="sum-val" id="sumRemains" style="color:#fbbf24;"></div></div>
+      <div class="sum-item"><div class="sum-label">Total Charge</div><div class="sum-val" id="sumCharge" style="color:#4ade80;"></div></div>
+      <div class="sum-item"><div class="sum-label">Completion Rate</div><div class="sum-val" id="sumRate" style="color:#34d399;"></div></div>
+    </div>
+  </div>
+</div>
+
+<footer><p>Powered by <strong>Order Tracker</strong> &mdash; Real-time order management</p></footer>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="od-overlay" id="odOverlay" onclick="if(event.target===this)closeOrderDetail()">
+  <div class="od-modal">
+    <div class="od-top-bar"></div>
+    <div class="od-body">
+      <div class="od-header">
+        <div>
+          <div class="od-title">Order Details</div>
+          <div class="od-sub" id="od-date-sub"></div>
+        </div>
+        <button class="od-close" onclick="closeOrderDetail()">✕</button>
+      </div>
+      <!-- Service + Status row -->
+      <div class="od-svc-row">
+        <div class="od-svc-icon" id="od-svc-icon"></div>
+        <div class="od-svc-info">
+          <div class="od-svc-name" id="od-svc-name"></div>
+          <div class="od-order-id" id="od-order-id-txt"></div>
+        </div>
+        <span class="sbadge" id="od-status-badge"></span>
+      </div>
+      <!-- Numbers grid -->
+      <div class="od-grid">
+        <div class="od-field">
+          <div class="od-field-label"><i class="fas fa-flag" style="margin-right:4px;color:#818cf8;"></i>Start Count</div>
+          <div class="od-field-value" id="od-start" style="color:#a5b4fc;"></div>
+        </div>
+        <div class="od-field">
+          <div class="od-field-label"><i class="fas fa-layer-group" style="margin-right:4px;color:#60a5fa;"></i>Quantity</div>
+          <div class="od-field-value" id="od-qty" style="color:#60a5fa;"></div>
+          <div class="od-pbar-wrap">
+            <div class="od-pbar"><div class="od-pbar-fill" id="od-pbar-fill" style="width:0%"></div></div>
+            <div class="od-pct" id="od-pct"></div>
+          </div>
+        </div>
+        <div class="od-field">
+          <div class="od-field-label"><i class="fas fa-hourglass-half" style="margin-right:4px;color:#fbbf24;"></i>Remains</div>
+          <div class="od-field-value" id="od-remains"></div>
+        </div>
+        <div class="od-field">
+          <div class="od-field-label"><i class="fas fa-bangladeshi-taka-sign" style="margin-right:4px;color:#4ade80;"></i>Charge</div>
+          <div class="od-field-value" id="od-charge" style="color:#4ade80;"></div>
+        </div>
+      </div>
+      <!-- Link -->
+      <div class="od-link-row" id="od-link-row" style="display:none;">
+        <i class="fas fa-link"></i>
+        <a class="od-link-anchor" id="od-link-anchor" href="#" target="_blank" rel="noopener"></a>
+      </div>
+      <!-- Note from admin -->
+      <div class="od-note" id="od-note-box" style="display:none;">
+        <div class="od-note-hdr"><i class="fas fa-note-sticky"></i><span>Note from Admin</span></div>
+        <div class="od-note-text" id="od-note-text"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA60vo5HrzxBbbxftGmjViMcw7aF9aHn6w",
+    authDomain: "payment-verify-c82a1.firebaseapp.com",
+    databaseURL: "https://payment-verify-c82a1-default-rtdb.firebaseio.com",
+    projectId: "payment-verify-c82a1",
+    storageBucket: "payment-verify-c82a1.firebasestorage.app",
+    messagingSenderId: "975872906866",
+    appId: "1:975872906866:web:542760adf1de66161054eb",
+    measurementId: "G-5Q5VQ67PGW"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  let allOrders = [];
+  let renderedOrders = [];
+
+  const platforms = {
+    "facebook":  { icon: "fab fa-facebook-f",    color: "#1877f2", bg: "rgba(24,119,242,0.15)" },
+    "instagram": { icon: "fab fa-instagram",      color: "#e1306c", bg: "rgba(225,48,108,0.15)" },
+    "youtube":   { icon: "fab fa-youtube",        color: "#ff0000", bg: "rgba(255,0,0,0.15)" },
+    "tiktok":    { icon: "fab fa-tiktok",         color: "#69c9d0", bg: "rgba(105,201,208,0.15)" },
+    "twitter":   { icon: "fab fa-twitter",        color: "#1da1f2", bg: "rgba(29,161,242,0.15)" },
+    "telegram":  { icon: "fab fa-telegram-plane", color: "#229ed9", bg: "rgba(34,158,217,0.15)" },
+    "linkedin":  { icon: "fab fa-linkedin-in",    color: "#0a66c2", bg: "rgba(10,102,194,0.15)" },
+    "snapchat":  { icon: "fab fa-snapchat",       color: "#fffc00", bg: "rgba(255,252,0,0.12)" },
+  };
+
+  const statusConfig = {
+    "Completed":   { cls: "s-completed" },
+    "In Progress": { cls: "s-progress"  },
+    "Pending":     { cls: "s-pending"   },
+    "Partial":     { cls: "s-partial"   },
+    "Cancelled":   { cls: "s-cancelled" },
+  };
+
+  function getPlatform(name) {
+    const lower = (name||'').toLowerCase();
+    for (const k in platforms) { if (lower.includes(k)) return platforms[k]; }
+    return { icon: "fas fa-share-alt", color: "#6366f1", bg: "rgba(99,102,241,0.15)" };
+  }
+
+  function shortenLink(url) {
+    try { const u = new URL(url); const p = u.pathname; return u.hostname.replace("www.","") + (p.length > 18 ? p.substring(0,18)+"…" : p); }
+    catch { return (url||'').substring(0,32)+"…"; }
+  }
+
+  function getProgress(qty, remains) {
+    if (!qty) return 0;
+    return Math.min(100, Math.round(((qty - remains) / qty) * 100));
+  }
+
+  function parseCharge(s) { return parseFloat(String(s).replace(/[^\d.]/g,"")) || 0; }
+
+  window.renderOrders = function(orders) {
+    const tbody = document.getElementById("orderTableBody");
+    tbody.innerHTML = "";
+    renderedOrders = orders; // save for detail modal
+    document.getElementById("orderCount").textContent = orders.length;
+    if (!orders.length) {
+      tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fas fa-inbox"></i><p>No orders found for this filter.</p></div></td></tr>`;
+      updateSummary([]);
+      return;
+    }
+    orders.forEach((order, i) => {
+      const pl  = getPlatform(order.service);
+      const sc  = statusConfig[order.status] || { cls: "s-pending" };
+      const pct = getProgress(+order.quantity||0, +order.remains||0);
+      const done = (+order.quantity||0) - (+order.remains||0);
+      const remainColor = (+order.remains||0) === 0 ? "#4ade80" : "#fbbf24";
+      const hasNote = !!(order.note && order.note.trim());
+      const tr = document.createElement("tr");
+      tr.dataset.status = order.status;
+      tr.title = "Click to view details";
+      tr.onclick = () => showOrderDetail(i);
+      tr.innerHTML = `
+        <td><div class="serial-num">${i+1}</div></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="order-id-txt">${esc(order.orderId||order.id||'–')}</div>
+            ${hasNote ? `<span title="Has note" style="color:#818cf8;font-size:0.65rem;"><i class="fas fa-note-sticky"></i></span>` : ''}
+          </div>
+        </td>
+        <td class="link-cell">
+          ${order.link ? `<a href="${esc(order.link)}" target="_blank" rel="noopener" title="${esc(order.link)}" onclick="event.stopPropagation()"><i class="fas fa-arrow-up-right-from-square"></i>${shortenLink(order.link)}</a>` : '<span style="color:var(--muted)">–</span>'}
+        </td>
+        <td>
+          <div class="svc-cell">
+            <div class="svc-icon" style="background:${pl.bg}; color:${pl.color};"><i class="${pl.icon}"></i></div>
+            <span class="svc-name">${esc(order.service)}</span>
+          </div>
+        </td>
+        <td><div class="start-count-cell">${(+order.startCount||0).toLocaleString()}</div><div class="start-count-sub">at start</div></td>
+        <td>
+          <div class="qty-num">${(+order.quantity||0).toLocaleString()}</div>
+          <div class="pbar"><div class="pbar-fill" style="width:${pct}%;"></div></div>
+          <div class="qty-sub">${done.toLocaleString()} done · ${pct}%</div>
+        </td>
+        <td><span class="remain-num" style="color:${remainColor};">${(+order.remains||0).toLocaleString()}</span></td>
+        <td><span class="charge-num">${esc(order.charge||'–')}</span></td>
+        <td><span class="date-txt">${esc(order.date||'–')}</span></td>
+        <td><span class="sbadge ${sc.cls}"><span class="sbadge-dot"></span>${esc(order.status)}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    updateSummary(orders);
+  };
+
+  function updateSummary(orders) {
+    const qty     = orders.reduce((a,o) => a + (+o.quantity||0), 0);
+    const remains = orders.reduce((a,o) => a + (+o.remains||0), 0);
+    const charge  = orders.reduce((a,o) => a + parseCharge(o.charge||0), 0);
+    const done    = orders.filter(o => o.status === "Completed").length;
+    const rate    = orders.length ? Math.round((done / orders.length) * 100) : 0;
+    document.getElementById("sumTotal").textContent   = orders.length;
+    document.getElementById("sumQty").textContent     = qty.toLocaleString();
+    document.getElementById("sumRemains").textContent = remains.toLocaleString();
+    document.getElementById("sumCharge").textContent  = "৳ " + charge.toFixed(2);
+    document.getElementById("sumRate").textContent    = rate + "%";
+  }
+
+  window.showOrderDetail = function(i) {
+    const order = renderedOrders[i];
+    if (!order) return;
+
+    const pl  = getPlatform(order.service);
+    const sc  = statusConfig[order.status] || { cls: "s-pending" };
+    const qty = +order.quantity || 0;
+    const rem = +order.remains  || 0;
+    const pct = getProgress(qty, rem);
+    const done = qty - rem;
+
+    // Service icon
+    const iconEl = document.getElementById("od-svc-icon");
+    iconEl.style.background = pl.bg;
+    iconEl.style.color = pl.color;
+    iconEl.innerHTML = `<i class="${pl.icon}"></i>`;
+
+    document.getElementById("od-svc-name").textContent    = order.service || "–";
+    document.getElementById("od-order-id-txt").textContent = "Order ID: " + (order.orderId || order.id || "–");
+    document.getElementById("od-date-sub").innerHTML      = order.date ? `<i class='fas fa-calendar-days' style='margin-right:5px;'></i>${esc(order.date)}` : "";
+
+    // Status badge
+    const badge = document.getElementById("od-status-badge");
+    badge.className = "sbadge " + sc.cls;
+    badge.innerHTML = `<span class="sbadge-dot"></span>${esc(order.status)}`;
+
+    // Numbers
+    document.getElementById("od-start").textContent = (+order.startCount||0).toLocaleString();
+    document.getElementById("od-qty").textContent   = qty.toLocaleString();
+    document.getElementById("od-pbar-fill").style.width = pct + "%";
+    document.getElementById("od-pct").textContent  = done.toLocaleString() + " done · " + pct + "%";
+
+    const remEl = document.getElementById("od-remains");
+    remEl.textContent   = rem.toLocaleString();
+    remEl.style.color   = rem === 0 ? "#4ade80" : "#fbbf24";
+
+    document.getElementById("od-charge").textContent = order.charge || "–";
+
+    // Link
+    const linkRow    = document.getElementById("od-link-row");
+    const linkAnchor = document.getElementById("od-link-anchor");
+    if (order.link) {
+      linkRow.style.display = "flex";
+      linkAnchor.href        = order.link;
+      linkAnchor.textContent = order.link;
+    } else {
+      linkRow.style.display = "none";
+    }
+
+    // Note
+    const noteBox  = document.getElementById("od-note-box");
+    const noteTxt  = document.getElementById("od-note-text");
+    if (order.note && order.note.trim()) {
+      noteBox.style.display = "block";
+      noteTxt.textContent   = order.note;
+    } else {
+      noteBox.style.display = "none";
+    }
+
+    document.getElementById("odOverlay").classList.add("show");
+    document.body.style.overflow = "hidden";
+  };
+
+  window.closeOrderDetail = function() {
+    document.getElementById("odOverlay").classList.remove("show");
+    document.body.style.overflow = "";
+  };
+
+  window.filterOrders = function(status, btn) {
+    document.querySelectorAll(".ftab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const list = status === "All" ? allOrders : allOrders.filter(o => o.status === status);
+    renderOrders(list);
+  };
+
+  function esc(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  async function loadData() {
+    try {
+      // Get publicKey from URL: ?=KEY
+      const params = new URLSearchParams(window.location.search);
+      const publicKey = params.get('');
+
+      if (!publicKey) {
+        throw new Error("No tracking link provided. Please use your personal tracking link.");
+      }
+
+      // Find customer by publicKey
+      const [custSnap, ordersSnap] = await Promise.all([
+        get(ref(db, 'customers')),
+        get(ref(db, 'orders'))
+      ]);
+
+      if (!custSnap.exists()) throw new Error("No customer data found.");
+
+      let customer = null, customerId = null;
+      for (const [id, c] of Object.entries(custSnap.val())) {
+        if (c.publicKey === publicKey) { customer = c; customerId = id; break; }
+      }
+
+      if (!customer) throw new Error("Invalid tracking link. Please contact support.");
+
+      // Fill profile
+      document.getElementById("avatarText").textContent = customer.avatar || (customer.name||'?').slice(0,2).toUpperCase();
+      document.getElementById("custName").textContent   = customer.name || '';
+      document.getElementById("custEmail").textContent  = customer.email || '';
+      document.getElementById("custPhone").textContent  = customer.phone || '';
+      document.getElementById("custJoined").textContent = customer.joined || '';
+
+      // Get orders for this customer
+      allOrders = [];
+      if (ordersSnap.exists()) {
+        for (const [, o] of Object.entries(ordersSnap.val())) {
+          if (o.customerId === customerId || o.publicKey === publicKey) {
+            allOrders.push(o);
+          }
+        }
+      }
+      // Sort by createdAt descending
+      allOrders.sort((a, b) => (b.createdAt||0) - (a.createdAt||0));
+
+      // Stats
+      const completed = allOrders.filter(o => o.status === "Completed").length;
+      const progress  = allOrders.filter(o => o.status === "In Progress").length;
+      const pending   = allOrders.filter(o => o.status === "Pending").length;
+
+      document.getElementById("statTotal").textContent     = allOrders.length;
+      document.getElementById("statCompleted").textContent = completed;
+      document.getElementById("statProgress").textContent  = progress;
+      document.getElementById("statPending").textContent   = pending;
+      document.getElementById("statBalance").textContent   = customer.balance   || '৳ 0';
+      document.getElementById("statSpent").textContent     = customer.totalSpent || '৳ 0';
+
+      renderOrders(allOrders);
+
+      document.getElementById("loader").classList.add("hidden");
+      document.getElementById("content").classList.remove("hidden");
+
+      // Live updates
+      onValue(ref(db, 'orders'), snap => {
+        allOrders = [];
+        if (snap.exists()) {
+          for (const [, o] of Object.entries(snap.val())) {
+            if (o.customerId === customerId || o.publicKey === publicKey) allOrders.push(o);
+          }
+        }
+        allOrders.sort((a, b) => (b.createdAt||0) - (a.createdAt||0));
+        // re-apply current filter
+        const activeBtn = document.querySelector('.ftab.active');
+        const status = activeBtn?.textContent?.trim() || 'All';
+        const list = status === 'All' ? allOrders : allOrders.filter(o => o.status === status);
+        renderOrders(list);
+        // update stats
+        document.getElementById("statTotal").textContent     = allOrders.length;
+        document.getElementById("statCompleted").textContent = allOrders.filter(o=>o.status==="Completed").length;
+        document.getElementById("statProgress").textContent  = allOrders.filter(o=>o.status==="In Progress").length;
+        document.getElementById("statPending").textContent   = allOrders.filter(o=>o.status==="Pending").length;
+      });
+
+      // Live customer updates
+      onValue(ref(db, `customers/${customerId}`), snap => {
+        if (!snap.exists()) return;
+        const c = snap.val();
+        document.getElementById("avatarText").textContent = c.avatar || (c.name||'?').slice(0,2).toUpperCase();
+        document.getElementById("custName").textContent   = c.name || '';
+        document.getElementById("custEmail").textContent  = c.email || '';
+        document.getElementById("custPhone").textContent  = c.phone || '';
+        document.getElementById("custJoined").textContent = c.joined || '';
+        document.getElementById("statBalance").textContent  = c.balance   || '৳ 0';
+        document.getElementById("statSpent").textContent    = c.totalSpent || '৳ 0';
+      });
+
+    } catch (err) {
+      document.getElementById("loader").innerHTML = `
+        <i class="fas fa-triangle-exclamation" style="font-size:2.4rem; color:#ef4444; margin-bottom:12px;"></i>
+        <p style="color:#f87171; font-weight:600; font-size:0.95rem;">Failed to load data</p>
+        <p style="color:var(--muted2); font-size:0.78rem; margin-top:6px;">${esc(err.message)}</p>
+        <button onclick="location.reload()" style="margin-top:18px; padding:8px 22px; background:#6366f1; color:#fff; border:none; border-radius:9px; cursor:pointer; font-weight:600; font-family:inherit;">
+          Try Again
+        </button>
+      `;
+    }
+  }
+
+  loadData();
+</script>
+</body>
+</html>
