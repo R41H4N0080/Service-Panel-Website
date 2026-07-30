@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #6366f1; --primary-d: #4f46e5; --primary-l: rgba(99,102,241,0.12);
+      --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+      --bg: #060b18; --surface: #0d1526; --surface2: #111827;
+      --border: #1e293b; --border2: #334155;
+      --text: #f1f5f9; --muted: #64748b; --muted2: #94a3b8;
+      --sidebar-w: 240px;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh;
+      background-image: radial-gradient(ellipse 80% 50% at 10% 0%, rgba(99,102,241,0.08) 0%, transparent 70%); }
+
+    /* ── LOGIN ── */
+    #loginScreen { min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(135deg,#060b18 0%,#0d1526 50%,#111827 100%); }
+    .login-box { background:var(--surface); border:1px solid var(--border); border-radius:20px;
+      padding:44px 36px; width:100%; max-width:400px; box-shadow:0 30px 60px rgba(0,0,0,.5); }
+    .login-brand { text-align:center; margin-bottom:32px; }
+    .login-brand .lb-icon { width:60px; height:60px; background:linear-gradient(135deg,#6366f1,#0ea5e9);
+      border-radius:16px; display:flex; align-items:center; justify-content:center;
+      margin:0 auto 14px; font-size:24px; box-shadow:0 0 24px rgba(99,102,241,.4); }
+    .login-brand h1 { font-size:22px; font-weight:800;
+      background:linear-gradient(135deg,#818cf8,#38bdf8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .login-brand p { color:var(--muted2); font-size:13px; margin-top:4px; }
+    .fl { margin-bottom:18px; }
+    .fl label { display:block; font-size:11px; font-weight:700; color:var(--muted2);
+      text-transform:uppercase; letter-spacing:.06em; margin-bottom:7px; }
+    .fl input { width:100%; padding:12px 14px; background:var(--surface2);
+      border:1.5px solid var(--border2); border-radius:10px; color:var(--text);
+      font-size:14px; font-family:inherit; outline:none; transition:border .2s; }
+    .fl input:focus { border-color:var(--primary); }
+    .login-btn { width:100%; padding:13px; background:var(--primary); color:#fff;
+      border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer;
+      font-family:inherit; transition:background .2s; margin-top:8px; }
+    .login-btn:hover { background:var(--primary-d); }
+    #loginErr { color:#f87171; font-size:13px; text-align:center; margin-top:12px; display:none; }
+
+    /* ── LAYOUT ── */
+    #app { display:none; min-height:100vh; }
+
+    /* SIDEBAR */
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:var(--sidebar-w);
+      background:var(--surface); border-right:1px solid var(--border);
+      display:flex; flex-direction:column; z-index:200; transition:transform .3s; }
+    .sb-header { padding:20px 18px 16px; border-bottom:1px solid var(--border); }
+    .sb-brand { display:flex; align-items:center; gap:10px; }
+    .sb-icon { width:34px; height:34px; background:linear-gradient(135deg,#6366f1,#0ea5e9);
+      border-radius:9px; display:flex; align-items:center; justify-content:center;
+      font-size:14px; box-shadow:0 0 12px rgba(99,102,241,.4); flex-shrink:0; }
+    .sb-icon i { color:#fff!important; -webkit-text-fill-color:#fff!important; }
+    .sb-brand-text h2 { font-size:15px; font-weight:800;
+      background:linear-gradient(135deg,#818cf8,#38bdf8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .sb-brand-text p { font-size:11px; color:var(--muted); margin-top:1px; }
+    .sb-nav { flex:1; padding:12px 10px; overflow-y:auto; }
+    .sb-section { font-size:10px; font-weight:700; color:var(--muted);
+      text-transform:uppercase; letter-spacing:.1em; padding:12px 8px 5px; }
+    .nav-item { display:flex; align-items:center; gap:9px; padding:10px 10px;
+      border-radius:10px; color:var(--muted2); font-size:13.5px; font-weight:500;
+      cursor:pointer; transition:all .15s; margin-bottom:2px; }
+    .nav-item:hover { background:var(--primary-l); color:#a5b4fc; }
+    .nav-item.active { background:var(--primary); color:#fff; box-shadow:0 0 14px rgba(99,102,241,.3); }
+    .nav-item i { width:18px; text-align:center; font-size:14px; }
+    .sb-footer { padding:12px 10px; border-top:1px solid var(--border); }
+    .logout-item { display:flex; align-items:center; gap:9px; padding:10px 10px;
+      border-radius:10px; color:#f87171; font-size:13.5px; font-weight:500;
+      cursor:pointer; transition:background .15s; }
+    .logout-item:hover { background:rgba(239,68,68,.1); }
+
+    /* OVERLAY for mobile */
+    .sb-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:199; }
+    .sb-overlay.show { display:block; }
+
+    /* MAIN */
+    .main { margin-left:var(--sidebar-w); min-height:100vh; display:flex; flex-direction:column; }
+    .topbar { position:sticky; top:0; z-index:100; background:rgba(13,21,38,.95);
+      backdrop-filter:blur(16px); border-bottom:1px solid var(--border);
+      padding:0 24px; height:58px; display:flex; align-items:center; justify-content:space-between; }
+    .topbar-left { display:flex; align-items:center; gap:14px; }
+    .hamburger { display:none; background:none; border:none; color:var(--muted2);
+      font-size:20px; cursor:pointer; padding:4px; }
+    .topbar h1 { font-size:17px; font-weight:800; }
+    .topbar-sub { color:var(--muted); font-size:12px; }
+    .topbar-right { color:var(--muted); font-size:12px; display:flex; align-items:center; gap:10px; }
+
+    .content { padding:24px; flex:1; }
+
+    /* STATS */
+    .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+    .sc { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; transition:transform .2s,border-color .2s; }
+    .sc:hover { transform:translateY(-3px); }
+    .sc-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .sc-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+    .sc-val { font-size:26px; font-weight:800; }
+    .sc-lbl { font-size:11px; font-weight:600; color:var(--muted2); text-transform:uppercase; letter-spacing:.05em; margin-top:4px; }
+    .sc.s1 .sc-icon { background:rgba(99,102,241,.15); color:#818cf8; } .sc.s1 .sc-val { color:#818cf8; }
+    .sc.s2 .sc-icon { background:rgba(16,185,129,.15); color:#34d399; } .sc.s2 .sc-val { color:#34d399; }
+    .sc.s3 .sc-icon { background:rgba(251,191,36,.15); color:#fbbf24; } .sc.s3 .sc-val { color:#fbbf24; }
+    .sc.s4 .sc-icon { background:rgba(239,68,68,.15); color:#f87171; } .sc.s4 .sc-val { color:#f87171; }
+
+    /* CARD */
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:16px;
+      padding:22px; margin-bottom:22px; }
+    .card-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; gap:12px; flex-wrap:wrap; }
+    .card-hdr-left h2 { font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; }
+    .card-hdr-left h2 i { color:var(--primary); }
+    .card-hdr-left p { font-size:12px; color:var(--muted2); margin-top:3px; }
+
+    /* SEARCH */
+    .search-row { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+    .search-input { flex:1; min-width:180px; padding:9px 13px; background:var(--surface2);
+      border:1.5px solid var(--border2); border-radius:10px; color:var(--text);
+      font-size:13px; font-family:inherit; outline:none; transition:border .2s; }
+    .search-input:focus { border-color:var(--primary); }
+    select.search-input { cursor:pointer; }
+
+    /* TABLE */
+    .tbl-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; min-width:600px; }
+    thead th { padding:10px 14px; text-align:left; font-size:11px; font-weight:700;
+      color:var(--muted); text-transform:uppercase; letter-spacing:.06em;
+      background:rgba(99,102,241,.05); border-bottom:1px solid var(--border); white-space:nowrap; }
+    tbody td { padding:11px 14px; font-size:13px; vertical-align:middle; border-bottom:1px solid rgba(30,41,59,.7); }
+    tbody tr:last-child td { border-bottom:none; }
+    tbody tr:hover td { background:rgba(99,102,241,.03); }
+    .actions { display:flex; gap:6px; }
+
+    /* BUTTONS */
+    .btn { display:inline-flex; align-items:center; gap:6px; padding:9px 17px;
+      border-radius:9px; font-size:13px; font-weight:600; cursor:pointer;
+      border:none; font-family:inherit; transition:all .2s; }
+    .btn:active { transform:scale(.97); }
+    .btn-primary { background:var(--primary); color:#fff; }
+    .btn-primary:hover { background:var(--primary-d); }
+    .btn-danger  { background:rgba(239,68,68,.15); color:#f87171; border:1px solid rgba(239,68,68,.25); }
+    .btn-danger:hover  { background:rgba(239,68,68,.25); }
+    .btn-ghost   { background:transparent; color:var(--muted2); border:1.5px solid var(--border2); }
+    .btn-ghost:hover   { background:var(--surface2); }
+    .btn-edit    { background:rgba(99,102,241,.12); color:#a5b4fc; border:1px solid rgba(99,102,241,.2); }
+    .btn-edit:hover    { background:rgba(99,102,241,.2); }
+    .btn-sm { padding:6px 12px; font-size:12px; border-radius:8px; }
+    .btn-icon { padding:7px 9px; }
+
+    /* BADGES */
+    .sbadge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px;
+      border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap; border:1px solid transparent; }
+    .sbadge-dot { width:5px; height:5px; border-radius:50%; }
+    .s-completed { background:rgba(16,185,129,.12); color:#34d399; border-color:rgba(16,185,129,.25); }
+    .s-completed .sbadge-dot { background:#10b981; }
+    .s-progress  { background:rgba(96,165,250,.12); color:#60a5fa; border-color:rgba(96,165,250,.25); }
+    .s-progress .sbadge-dot  { background:#3b82f6; }
+    .s-pending   { background:rgba(251,191,36,.12); color:#fbbf24; border-color:rgba(251,191,36,.25); }
+    .s-pending .sbadge-dot   { background:#f59e0b; }
+    .s-partial   { background:rgba(251,146,60,.12); color:#fb923c; border-color:rgba(251,146,60,.25); }
+    .s-partial .sbadge-dot   { background:#f97316; }
+    .s-cancelled { background:rgba(239,68,68,.12); color:#f87171; border-color:rgba(239,68,68,.25); }
+    .s-cancelled .sbadge-dot { background:#ef4444; }
+
+    /* LINK COPY */
+    .link-chip { display:flex; align-items:center; gap:7px; background:var(--primary-l);
+      border:1px solid rgba(99,102,241,.25); border-radius:8px; padding:5px 10px; max-width:300px; }
+    .link-chip span { flex:1; font-size:11px; color:#a5b4fc; overflow:hidden;
+      text-overflow:ellipsis; white-space:nowrap; }
+    .copy-btn { background:var(--primary); color:#fff; border:none; padding:3px 9px;
+      border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; flex-shrink:0; }
+    .copy-btn:hover { background:var(--primary-d); }
+
+    /* MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7);
+      backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center;
+      z-index:9999; padding:16px; }
+    .modal-overlay.show { display:flex; }
+    .modal { background:var(--surface); border:1px solid var(--border2);
+      border-radius:18px; padding:28px; width:100%; max-width:560px;
+      max-height:92vh; overflow-y:auto; box-shadow:0 30px 60px rgba(0,0,0,.6); }
+    .modal-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+    .modal-hdr h3 { font-size:17px; font-weight:800; }
+    .modal-close { background:var(--surface2); border:1px solid var(--border2);
+      color:var(--muted2); width:30px; height:30px; border-radius:8px;
+      cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; }
+    .modal-close:hover { background:var(--border2); }
+    .modal-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:22px; border-top:1px solid var(--border); padding-top:18px; }
+
+    /* FORM */
+    .fgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .fgrid.c3 { grid-template-columns:1fr 1fr 1fr; }
+    .fg { margin-bottom:14px; }
+    .fg label { display:block; font-size:11px; font-weight:700; color:var(--muted2);
+      text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+    .fg input, .fg select, .fg textarea {
+      width:100%; padding:10px 13px; background:var(--surface2);
+      border:1.5px solid var(--border2); border-radius:9px; color:var(--text);
+      font-size:13px; font-family:inherit; outline:none; transition:border .2s; }
+    .fg input:focus, .fg select:focus, .fg textarea:focus { border-color:var(--primary); }
+    .fg textarea { resize:vertical; min-height:70px; }
+    .fg select option { background:var(--surface2); }
+
+    /* LINK PREVIEW in modal */
+    .link-preview-box { background:rgba(99,102,241,.07); border:1px solid rgba(99,102,241,.2);
+      border-radius:10px; padding:13px 15px; margin-top:6px; display:none; }
+    .link-preview-box .lp-label { font-size:10px; font-weight:700; color:var(--muted);
+      text-transform:uppercase; letter-spacing:.06em; margin-bottom:7px; }
+    .link-preview-box .lp-url { font-size:12px; color:#a5b4fc; word-break:break-all; margin-bottom:8px; }
+    .lp-copy-btn { background:var(--primary); color:#fff; border:none; padding:5px 14px;
+      border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; }
+
+    /* SECURITY */
+    .pw-bar { height:4px; border-radius:2px; margin-top:7px; transition:all .3s; background:var(--border2); }
+    .pw-hint { font-size:11px; color:var(--muted); margin-top:5px; }
+
+    /* TOAST */
+    .toast-wrap { position:fixed; bottom:22px; right:22px; z-index:99999; display:flex; flex-direction:column; gap:8px; }
+    .toast { background:var(--surface2); border:1px solid var(--border2); border-radius:11px;
+      padding:12px 16px; display:flex; align-items:center; gap:9px; font-size:13px; font-weight:500;
+      min-width:240px; box-shadow:0 10px 30px rgba(0,0,0,.4);
+      border-left:3px solid var(--success); animation:tin .3s ease; }
+    .toast.err { border-left-color:var(--danger); }
+    .toast.info { border-left-color:var(--primary); }
+    @keyframes tin { from{transform:translateX(110%);opacity:0} to{transform:translateX(0);opacity:1} }
+
+    /* SECTION PAGES */
+    .sp { display:none; } .sp.active { display:block; }
+
+    /* EMPTY */
+    .empty-st { text-align:center; padding:48px 20px; }
+    .empty-st i { font-size:2.5rem; color:var(--border2); display:block; margin-bottom:12px; }
+    .empty-st p { color:var(--muted); font-size:13px; }
+
+    /* PASSWORD settings */
+    .set-card { max-width:480px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .sidebar { transform:translateX(-100%); }
+      .sidebar.open { transform:translateX(0); }
+      .main { margin-left:0; }
+      .hamburger { display:block; }
+      .stats-row { grid-template-columns:repeat(2,1fr); }
+    }
+    @media (max-width: 580px) {
+      .fgrid { grid-template-columns:1fr; }
+      .fgrid.c3 { grid-template-columns:1fr; }
+      .stats-row { grid-template-columns:1fr 1fr; }
+      .content { padding:14px; }
+      .topbar { padding:0 14px; }
+      .card { padding:16px; }
+      .modal { padding:20px 16px; }
+      .card-hdr { flex-direction:column; align-items:flex-start; }
+    }
+    @media (max-width: 400px) {
+      .stats-row { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-brand">
+      <div class="lb-icon"><i class="fas fa-shield-halved" style="color:#fff;-webkit-text-fill-color:#fff;"></i></div>
+      <h1>Admin Panel</h1>
+      <p>Order Tracker Management</p>
+    </div>
+    <div class="fl">
+      <label>Password</label>
+      <input type="password" id="loginPw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <button class="login-btn" onclick="doLogin()"><i class="fas fa-arrow-right-to-bracket"></i> Sign In</button>
+    <p id="loginErr">❌ Incorrect password</p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="app">
+  <!-- Sidebar overlay -->
+  <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-icon"><i class="fas fa-clipboard-list"></i></div>
+        <div class="sb-brand-text"><h2>Order Tracker</h2><p>Admin Console</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Overview</div>
+      <div class="nav-item active" onclick="showPage('overview',this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
+      <div class="sb-section">Manage</div>
+      <div class="nav-item" onclick="showPage('customers',this)"><i class="fas fa-users"></i> Customers</div>
+      <div class="nav-item" onclick="showPage('orders',this)"><i class="fas fa-list-ul"></i> Orders</div>
+      <div class="sb-section">Settings</div>
+      <div class="nav-item" onclick="showPage('settings',this)"><i class="fas fa-gear"></i> Site Settings</div>
+      <div class="nav-item" onclick="showPage('security',this)"><i class="fas fa-lock"></i> Security</div>
+    </nav>
+    <div class="sb-footer">
+      <div class="logout-item" onclick="doLogout()"><i class="fas fa-right-from-bracket"></i> Logout</div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div>
+          <h1 id="pageTitle">Dashboard</h1>
+          <div class="topbar-sub" id="pageSubtitle">Welcome back</div>
+        </div>
+      </div>
+      <div class="topbar-right" id="topbarDate"></div>
+    </div>
+
+    <div class="content">
+
+      <!-- OVERVIEW -->
+      <div class="sp active" id="sp-overview">
+        <div class="stats-row" id="statsRow">
+          <div class="sc s1"><div class="sc-top"><div class="sc-icon"><i class="fas fa-users"></i></div></div><div class="sc-val" id="st-cust">–</div><div class="sc-lbl">Customers</div></div>
+          <div class="sc s2"><div class="sc-top"><div class="sc-icon"><i class="fas fa-layer-group"></i></div></div><div class="sc-val" id="st-ord">–</div><div class="sc-lbl">Total Orders</div></div>
+          <div class="sc s3"><div class="sc-top"><div class="sc-icon"><i class="fas fa-clock"></i></div></div><div class="sc-val" id="st-pend">–</div><div class="sc-lbl">Pending</div></div>
+          <div class="sc s4"><div class="sc-top"><div class="sc-icon"><i class="fas fa-circle-check"></i></div></div><div class="sc-val" id="st-done">–</div><div class="sc-lbl">Completed</div></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-hdr-left"><h2><i class="fas fa-clock-rotate-left"></i> Recent Orders</h2><p>Last 5 orders</p></div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Customer</th><th>Order ID</th><th>Service</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="recentTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS -->
+      <div class="sp" id="sp-customers">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-hdr-left"><h2><i class="fas fa-users"></i> Customers</h2><p>Manage customers & their public tracking links</p></div>
+            <button class="btn btn-primary btn-sm" onclick="openCustModal()"><i class="fas fa-plus"></i> Add Customer</button>
+          </div>
+          <div class="search-row">
+            <input class="search-input" id="custSearch" placeholder="🔍  Search customers…" oninput="renderCusts()" />
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Balance</th><th>Total Spent</th><th>Public Link</th><th>Orders</th><th>Actions</th></tr></thead>
+              <tbody id="custTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div class="sp" id="sp-orders">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-hdr-left"><h2><i class="fas fa-list-ul"></i> Orders</h2><p>CRUD for all customer orders</p></div>
+            <button class="btn btn-primary btn-sm" onclick="openOrderModal()"><i class="fas fa-plus"></i> Add Order</button>
+          </div>
+          <div class="search-row">
+            <input class="search-input" id="ordSearch" placeholder="🔍  Search by customer, order ID, service…" oninput="renderOrders()" style="flex:1;" />
+            <select class="search-input" id="ordFilter" onchange="renderOrders()" style="flex:0 0 auto;min-width:130px;">
+              <option value="">All Status</option>
+              <option>Completed</option><option>In Progress</option>
+              <option>Pending</option><option>Partial</option><option>Cancelled</option>
+            </select>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Customer</th><th>Order ID</th><th>Service</th><th>Start</th><th>Qty</th><th>Remains</th><th>Charge</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="ordTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="sp" id="sp-settings">
+        <div class="card">
+          <div class="card-hdr"><div class="card-hdr-left"><h2><i class="fas fa-gear"></i> Site Settings</h2></div></div>
+          <div class="fgrid">
+            <div class="fg"><label>Site Name</label><input type="text" id="s-name" placeholder="Order Tracker" /></div>
+            <div class="fg"><label>🌐 Tracking Page Base URL</label><input type="text" id="s-baseurl" placeholder="https://bb.com/order_tracking.html" /></div>
+          </div>
+          <div class="fgrid">
+            <div class="fg"><label>Contact Email</label><input type="email" id="s-email" /></div>
+            <div class="fg"><label>Contact Phone</label><input type="text" id="s-phone" /></div>
+          </div>
+          <div class="fg"><label>Notice / Announcement</label><textarea id="s-notice" placeholder="Shown on tracking page…"></textarea></div>
+          <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-floppy-disk"></i> Save Settings</button>
+        </div>
+      </div>
+
+      <!-- SECURITY -->
+      <div class="sp" id="sp-security">
+        <div class="card set-card">
+          <div class="card-hdr"><div class="card-hdr-left"><h2><i class="fas fa-lock"></i> Change Password</h2></div></div>
+          <div class="fg"><label>Current Password</label><input type="password" id="sec-cur" /></div>
+          <div class="fg"><label>New Password</label><input type="password" id="sec-new" oninput="checkPw(this.value)" /><div class="pw-bar" id="pwBar"></div><div class="pw-hint" id="pwHint">Min 6 characters</div></div>
+          <div class="fg"><label>Confirm New Password</label><input type="password" id="sec-con" /></div>
+          <button class="btn btn-primary" onclick="changePw()"><i class="fas fa-lock"></i> Update Password</button>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- CUSTOMER MODAL -->
+<div class="modal-overlay" id="custModal">
+  <div class="modal">
+    <div class="modal-hdr"><h3 id="custModalTitle">Add Customer</h3><button class="modal-close" onclick="closeCustModal()">✕</button></div>
+    <div class="fgrid">
+      <div class="fg"><label>Full Name *</label><input type="text" id="c-name" placeholder="e.g. Rakib Hasan" oninput="previewCustLink()" /></div>
+      <div class="fg"><label>Avatar Initials</label><input type="text" id="c-avatar" placeholder="RH" maxlength="3" /></div>
+    </div>
+    <div class="fgrid">
+      <div class="fg"><label>Email</label><input type="email" id="c-email" placeholder="rakib@email.com" /></div>
+      <div class="fg"><label>Phone</label><input type="text" id="c-phone" placeholder="+880 1XXX-XXXXXX" /></div>
+    </div>
+    <div class="fgrid">
+      <div class="fg"><label>Joined (display text)</label><input type="text" id="c-joined" placeholder="e.g. Jan 2024" /></div>
+      <div class="fg"><label>Balance (Paid Amount)</label><input type="text" id="c-balance" placeholder="৳ 0" /></div>
+    </div>
+    <div class="fg"><label>Total Spent</label><input type="text" id="c-spent" placeholder="৳ 0" /></div>
+    <!-- Link preview -->
+    <div class="link-preview-box" id="custLinkPreview">
+      <div class="lp-label">🔗 Generated Public Link</div>
+      <div class="lp-url" id="custLinkPreviewUrl"></div>
+      <button class="lp-copy-btn" onclick="copyPreview()">Copy Link</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeCustModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveCust()">Save Customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="modal-overlay" id="ordModal">
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-hdr"><h3 id="ordModalTitle">Add Order</h3><button class="modal-close" onclick="closeOrderModal()">✕</button></div>
+    <div class="fg">
+      <label>Customer *</label>
+      <select id="o-cust" onchange="onCustChange()"><option value="">Select customer…</option></select>
+    </div>
+    <div id="o-cust-info" style="display:none;background:var(--primary-l);border:1px solid rgba(99,102,241,.2);border-radius:9px;padding:9px 13px;margin-bottom:14px;font-size:12px;color:#a5b4fc;"></div>
+    <div class="fgrid">
+      <div class="fg"><label>Order ID</label><input type="text" id="o-id" placeholder="e.g. #10482" /></div>
+      <div class="fg"><label>Service *</label><input type="text" id="o-svc" placeholder="e.g. Facebook Page Likes" /></div>
+    </div>
+    <div class="fg"><label>Link (target URL)</label><input type="text" id="o-link" placeholder="https://facebook.com/page/..." /></div>
+    <div class="fgrid c3">
+      <div class="fg"><label>Start Count</label><input type="number" id="o-start" placeholder="0" min="0" /></div>
+      <div class="fg"><label>Quantity</label><input type="number" id="o-qty" placeholder="1000" min="0" /></div>
+      <div class="fg"><label>Remains</label><input type="number" id="o-rem" placeholder="0" min="0" /></div>
+    </div>
+    <div class="fgrid">
+      <div class="fg"><label>Charge</label><input type="text" id="o-charge" placeholder="৳ 250" /></div>
+      <div class="fg"><label>Date</label><input type="date" id="o-date" /></div>
+    </div>
+    <div class="fg">
+      <label>Status *</label>
+      <select id="o-status">
+        <option>Pending</option><option>In Progress</option>
+        <option>Completed</option><option>Partial</option><option>Cancelled</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label><i class="fas fa-note-sticky" style="margin-right:5px;color:var(--primary);"></i>Note <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">(visible to customer)</span></label>
+      <textarea id="o-note" placeholder="e.g. Order is being processed. Expected delivery in 24 hours…" style="min-height:80px;"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeOrderModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveOrder()">Save Order</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, set, get, push, update, remove, onValue }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA60vo5HrzxBbbxftGmjViMcw7aF9aHn6w",
+    authDomain: "payment-verify-c82a1.firebaseapp.com",
+    databaseURL: "https://payment-verify-c82a1-default-rtdb.firebaseio.com",
+    projectId: "payment-verify-c82a1",
+    storageBucket: "payment-verify-c82a1.firebasestorage.app",
+    messagingSenderId: "975872906866",
+    appId: "1:975872906866:web:542760adf1de66161054eb",
+    measurementId: "G-5Q5VQ67PGW"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  /* ─── STATE ─── */
+  let customers = {}, orders = {}, settings = {};
+  let editCustId = null, editOrdId = null, generatedPk = null;
+
+  /* ─── INIT ─── */
+  window.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('topbarDate').textContent =
+      new Date().toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+    const snap = await get(ref(db, 'admin/password'));
+    if (!snap.exists()) await set(ref(db, 'admin/password'), 'Admin@1234');
+    if (sessionStorage.getItem('admin_ok') === '1') showApp();
+  });
+
+  /* ─── AUTH ─── */
+  window.doLogin = async function() {
+    const pw = document.getElementById('loginPw').value;
+    const s  = await get(ref(db, 'admin/password'));
+    if (s.exists() && s.val() === pw) {
+      sessionStorage.setItem('admin_ok', '1');
+      document.getElementById('loginErr').style.display = 'none';
+      showApp();
+    } else { document.getElementById('loginErr').style.display = 'block'; }
+  };
+
+  window.doLogout = function() {
+    sessionStorage.removeItem('admin_ok');
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('loginPw').value = '';
+    closeSidebar();
+  };
+
+  function showApp() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadSettings();
+    onValue(ref(db,'customers'), s => { customers = s.exists() ? s.val() : {}; renderCusts(); updateStats(); });
+    onValue(ref(db,'orders'),    s => { orders    = s.exists() ? s.val() : {}; renderOrders(); renderRecent(); updateStats(); });
+  }
+
+  /* ─── MOBILE SIDEBAR ─── */
+  window.toggleSidebar = function() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sbOverlay').classList.toggle('show');
+  };
+  window.closeSidebar = function() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sbOverlay').classList.remove('show');
+  };
+
+  /* ─── NAV ─── */
+  window.showPage = function(page, el) {
+    document.querySelectorAll('.sp').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('sp-' + page).classList.add('active');
+    el.classList.add('active');
+    const t = {
+      overview: ['Dashboard','Overview'],
+      customers:['Customers','Manage & generate tracking links'],
+      orders:   ['Orders','Full CRUD for all orders'],
+      settings: ['Site Settings','Configure platform'],
+      security: ['Security','Change password']
+    };
+    document.getElementById('pageTitle').textContent    = t[page][0];
+    document.getElementById('pageSubtitle').textContent = t[page][1];
+    closeSidebar();
+  };
+
+  /* ─── STATS ─── */
+  function updateStats() {
+    const ov = Object.values(orders);
+    document.getElementById('st-cust').textContent = Object.keys(customers).length;
+    document.getElementById('st-ord').textContent  = ov.length;
+    document.getElementById('st-pend').textContent = ov.filter(o=>o.status==='Pending').length;
+    document.getElementById('st-done').textContent = ov.filter(o=>o.status==='Completed').length;
+  }
+
+  /* ─── SETTINGS ─── */
+  async function loadSettings() {
+    const s = await get(ref(db,'settings'));
+    if (s.exists()) {
+      settings = s.val();
+      gv('s-name',   settings.name   || '');
+      gv('s-baseurl',settings.baseurl || '');
+      gv('s-email',  settings.email  || '');
+      gv('s-phone',  settings.phone  || '');
+      gv('s-notice', settings.notice || '');
+    }
+  }
+  window.saveSettings = async function() {
+    settings = { name:v('s-name'), baseurl:v('s-baseurl'), email:v('s-email'), phone:v('s-phone'), notice:v('s-notice') };
+    await set(ref(db,'settings'), settings);
+    toast('Settings saved!');
+  };
+  function getBaseUrl() { return (settings.baseurl||'order_tracking.html').replace(/\/$/,''); }
+  function makeLink(pk) { return getBaseUrl() + '?=' + pk; }
+
+  /* ─── CUSTOMERS ─── */
+  window.renderCusts = function() {
+    const tbody = document.getElementById('custTbody');
+    const q = document.getElementById('custSearch').value.toLowerCase();
+    let list = Object.entries(customers).filter(([,c]) => !q || (c.name||'').toLowerCase().includes(q));
+    list.sort((a,b) => (b[1].createdAt||0)-(a[1].createdAt||0));
+    if (!list.length) { tbody.innerHTML = `<tr><td colspan="10"><div class="empty-st"><i class="fas fa-users"></i><p>No customers yet</p></div></td></tr>`; return; }
+    tbody.innerHTML = list.map(([id,c],i) => {
+      const cnt  = Object.values(orders).filter(o=>o.customerId===id).length;
+      const link = makeLink(c.publicKey||'');
+      return `<tr>
+        <td style="color:var(--muted2)">${i+1}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:9px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#0ea5e9);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;">${esc((c.avatar||(c.name||'?').slice(0,2)).toUpperCase())}</div>
+            <strong>${esc(c.name)}</strong>
+          </div>
+        </td>
+        <td style="color:var(--muted2)">${esc(c.email)||'–'}</td>
+        <td style="color:var(--muted2)">${esc(c.phone)||'–'}</td>
+        <td style="color:var(--muted2)">${esc(c.joined)||'–'}</td>
+        <td style="color:#4ade80;font-weight:700;">${esc(c.balance)||'–'}</td>
+        <td style="color:#38bdf8;font-weight:700;">${esc(c.totalSpent)||'–'}</td>
+        <td>
+          <div class="link-chip">
+            <span title="${esc(link)}">${esc(link)}</span>
+            <button class="copy-btn" onclick="cp('${esc(link)}',this)">Copy</button>
+          </div>
+        </td>
+        <td><span style="color:var(--primary);font-weight:700;cursor:pointer;" onclick="filterByCustomer('${id}')">${cnt}</span></td>
+        <td><div class="actions">
+          <button class="btn btn-edit btn-sm btn-icon" onclick="openCustModal('${id}')"><i class="fas fa-pen"></i></button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="delCust('${id}')"><i class="fas fa-trash"></i></button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  };
+
+  window.openCustModal = function(id=null) {
+    editCustId=id; generatedPk=null;
+    document.getElementById('custModalTitle').textContent = id ? 'Edit Customer' : 'Add Customer';
+    if (id && customers[id]) {
+      const c=customers[id];
+      gv('c-name',c.name||''); gv('c-avatar',c.avatar||'');
+      gv('c-email',c.email||''); gv('c-phone',c.phone||'');
+      gv('c-joined',c.joined||''); gv('c-balance',c.balance||'');
+      gv('c-spent',c.totalSpent||'');
+      generatedPk = c.publicKey;
+      showLinkPreview(c.publicKey);
+    } else {
+      ['c-name','c-avatar','c-email','c-phone','c-joined','c-balance','c-spent'].forEach(i=>gv(i,''));
+      document.getElementById('custLinkPreview').style.display='none';
+    }
+    document.getElementById('custModal').classList.add('show');
+  };
+
+  window.closeCustModal = function() { document.getElementById('custModal').classList.remove('show'); editCustId=null; generatedPk=null; };
+
+  window.previewCustLink = function() {
+    const name=v('c-name'); if(!name||editCustId){return;}
+    if(!generatedPk) generatedPk=genPk(name);
+    showLinkPreview(generatedPk);
+  };
+
+  function showLinkPreview(pk) {
+    const box=document.getElementById('custLinkPreview');
+    document.getElementById('custLinkPreviewUrl').textContent = makeLink(pk);
+    box.style.display='block';
+  }
+
+  window.copyPreview = function() { cp(document.getElementById('custLinkPreviewUrl').textContent); };
+
+  window.saveCust = async function() {
+    const name=v('c-name'); if(!name){toast('Name required','err');return;}
+    const data={name, avatar:v('c-avatar')||name.slice(0,2).toUpperCase(), email:v('c-email'), phone:v('c-phone'), joined:v('c-joined'), balance:v('c-balance'), totalSpent:v('c-spent')};
+    if (editCustId) {
+      await update(ref(db,`customers/${editCustId}`),data);
+      toast('Customer updated!');
+    } else {
+      data.publicKey = generatedPk||genPk(name);
+      data.createdAt = Date.now();
+      await push(ref(db,'customers'),data);
+      toast('Customer added!');
+    }
+    closeCustModal();
+  };
+
+  window.delCust = async function(id) {
+    if(!confirm('Delete customer? Their orders will NOT be deleted.'))return;
+    await remove(ref(db,`customers/${id}`));
+    toast('Customer deleted','info');
+  };
+
+  /* ─── ORDERS ─── */
+  window.renderOrders = function() {
+    const tbody=document.getElementById('ordTbody');
+    const q=document.getElementById('ordSearch').value.toLowerCase();
+    const sf=document.getElementById('ordFilter').value;
+    let list=Object.entries(orders).filter(([,o])=>{
+      const cust=o.customerId&&customers[o.customerId]?customers[o.customerId]:null;
+      const m = !q||
+        (o.orderId||'').toLowerCase().includes(q)||
+        (o.service||'').toLowerCase().includes(q)||
+        (cust?.name||o.customerName||'').toLowerCase().includes(q);
+      return m&&(!sf||o.status===sf);
+    });
+    list.sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0));
+    if(!list.length){tbody.innerHTML=`<tr><td colspan="11"><div class="empty-st"><i class="fas fa-inbox"></i><p>No orders found</p></div></td></tr>`;return;}
+    const sc={
+      'Completed':'s-completed','In Progress':'s-progress',
+      'Pending':'s-pending','Partial':'s-partial','Cancelled':'s-cancelled'
+    };
+    tbody.innerHTML=list.map(([id,o],i)=>{
+      const cust=o.customerId&&customers[o.customerId]?customers[o.customerId]:null;
+      const custName=cust?cust.name:(o.customerName||'–');
+      const cls=sc[o.status]||'s-pending';
+      return `<tr>
+        <td style="color:var(--muted2)">${i+1}</td>
+        <td><strong>${esc(custName)}</strong></td>
+        <td style="color:#a5b4fc;font-weight:600;">${esc(o.orderId||'–')}</td>
+        <td>${esc(o.service||'–')}</td>
+        <td style="color:#a5b4fc">${(+o.startCount||0).toLocaleString()}</td>
+        <td style="font-weight:700">${(+o.quantity||0).toLocaleString()}</td>
+        <td style="color:${(+o.remains||0)===0?'#4ade80':'#fbbf24'};font-weight:700">${(+o.remains||0).toLocaleString()}</td>
+        <td style="color:#4ade80;font-weight:700">${esc(o.charge||'–')}</td>
+        <td style="color:var(--muted2)">${esc(o.date||'–')}</td>
+        <td><span class="sbadge ${cls}"><span class="sbadge-dot"></span>${esc(o.status)}</span></td>
+        <td><div class="actions">
+          <button class="btn btn-edit btn-sm btn-icon" onclick="openOrderModal('${id}')"><i class="fas fa-pen"></i></button>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="delOrder('${id}')"><i class="fas fa-trash"></i></button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  };
+
+  function renderRecent() {
+    const tbody=document.getElementById('recentTbody');
+    const list=Object.entries(orders).sort((a,b)=>(b[1].createdAt||0)-(a[1].createdAt||0)).slice(0,5);
+    if(!list.length){tbody.innerHTML=`<tr><td colspan="6"><div class="empty-st"><i class="fas fa-inbox"></i><p>No orders yet</p></div></td></tr>`;return;}
+    const sc={'Completed':'s-completed','In Progress':'s-progress','Pending':'s-pending','Partial':'s-partial','Cancelled':'s-cancelled'};
+    tbody.innerHTML=list.map(([,o],i)=>{
+      const cust=o.customerId&&customers[o.customerId]?customers[o.customerId]:null;
+      return `<tr>
+        <td style="color:var(--muted2)">${i+1}</td>
+        <td>${esc(cust?cust.name:o.customerName||'–')}</td>
+        <td style="color:#a5b4fc;font-weight:600;">${esc(o.orderId||'–')}</td>
+        <td>${esc(o.service||'–')}</td>
+        <td><span class="sbadge ${sc[o.status]||'s-pending'}"><span class="sbadge-dot"></span>${esc(o.status)}</span></td>
+        <td style="color:var(--muted2)">${esc(o.date||'–')}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  window.filterByCustomer = function(custId) {
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    document.querySelector('.nav-item:nth-child(3)').classList.add('active');
+    showPage('orders', document.querySelector('.nav-item:nth-child(3)'));
+    document.getElementById('ordSearch').value = customers[custId]?.name||'';
+    renderOrders();
+  };
+
+  window.openOrderModal = function(id=null) {
+    editOrdId=id;
+    document.getElementById('ordModalTitle').textContent=id?'Edit Order':'Add Order';
+    // Fill customer dropdown
+    const sel=document.getElementById('o-cust');
+    const sorted=Object.entries(customers).sort((a,b)=>a[1].name.localeCompare(b[1].name));
+    sel.innerHTML='<option value="">Select customer…</option>'+sorted.map(([cid,c])=>`<option value="${cid}">${esc(c.name)}</option>`).join('');
+    if(id&&orders[id]){
+      const o=orders[id];
+      sel.value=o.customerId||'';onCustChange();
+      gv('o-id',o.orderId||''); gv('o-svc',o.service||'');
+      gv('o-link',o.link||''); gv('o-start',o.startCount||'');
+      gv('o-qty',o.quantity||''); gv('o-rem',o.remains||'');
+      gv('o-charge',o.charge||''); gv('o-date',o.date||'');
+      document.getElementById('o-status').value=o.status||'Pending';
+      gv('o-note',o.note||'');
+    } else {
+      ['o-id','o-svc','o-link','o-start','o-qty','o-rem','o-charge','o-note'].forEach(i=>gv(i,''));
+      document.getElementById('o-status').value='Pending';
+      document.getElementById('o-date').value=new Date().toISOString().split('T')[0];
+      document.getElementById('o-cust-info').style.display='none';
+      sel.value='';
+    }
+    document.getElementById('ordModal').classList.add('show');
+  };
+
+  window.onCustChange = function() {
+    const cid=document.getElementById('o-cust').value;
+    const info=document.getElementById('o-cust-info');
+    if(cid&&customers[cid]){
+      const c=customers[cid];
+      info.style.display='block';
+      info.innerHTML=`<i class="fas fa-user" style="margin-right:6px;"></i><strong>${esc(c.name)}</strong>${c.phone?' · '+esc(c.phone):''}${c.email?' · '+esc(c.email):''}`;
+    } else { info.style.display='none'; }
+  };
+
+  window.closeOrderModal = function() { document.getElementById('ordModal').classList.remove('show'); editOrdId=null; };
+
+  window.saveOrder = async function() {
+    const cid=document.getElementById('o-cust').value;
+    const svc=v('o-svc');
+    if(!cid){toast('Select a customer','err');return;}
+    if(!svc){toast('Service required','err');return;}
+    const cust=customers[cid];
+    const data={
+      customerId:cid, customerName:cust?cust.name:'', publicKey:cust?cust.publicKey:'',
+      orderId:v('o-id'), service:svc, link:v('o-link'),
+      startCount:+document.getElementById('o-start').value||0,
+      quantity:+document.getElementById('o-qty').value||0,
+      remains:+document.getElementById('o-rem').value||0,
+      charge:v('o-charge'), date:v('o-date'),
+      status:document.getElementById('o-status').value,
+      note:v('o-note'),
+    };
+    if(editOrdId){
+      await update(ref(db,`orders/${editOrdId}`),data);
+      toast('Order updated!');
+    } else {
+      data.createdAt=Date.now();
+      await push(ref(db,'orders'),data);
+      toast('Order added!');
+    }
+    closeOrderModal();
+  };
+
+  window.delOrder = async function(id) {
+    if(!confirm('Delete this order?'))return;
+    await remove(ref(db,`orders/${id}`));
+    toast('Order deleted','info');
+  };
+
+  /* ─── SECURITY ─── */
+  window.checkPw = function(pw) {
+    const bar=document.getElementById('pwBar'); const hint=document.getElementById('pwHint');
+    if(!pw){bar.style.width='0';bar.style.background='var(--border2)';hint.textContent='Min 6 characters';return;}
+    let s=0; if(pw.length>=6)s++;if(pw.length>=10)s++;if(/[A-Z]/.test(pw))s++;if(/\d/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;
+    const lvl=[{c:'#ef4444',l:'Very Weak',w:'20%'},{c:'#f59e0b',l:'Weak',w:'40%'},{c:'#f59e0b',l:'Fair',w:'60%'},{c:'#10b981',l:'Strong',w:'80%'},{c:'#10b981',l:'Very Strong',w:'100%'}];
+    const L=lvl[Math.min(s-1,4)]||lvl[0];
+    bar.style.width=L.w;bar.style.background=L.c;hint.textContent=L.l;
+  };
+
+  window.changePw = async function() {
+    const cur=document.getElementById('sec-cur').value;
+    const nw =document.getElementById('sec-new').value;
+    const con=document.getElementById('sec-con').value;
+    const s=await get(ref(db,'admin/password'));
+    if(!s.exists()||s.val()!==cur){toast('Wrong current password','err');return;}
+    if(nw.length<6){toast('New password min 6 chars','err');return;}
+    if(nw!==con){toast('Passwords do not match','err');return;}
+    await set(ref(db,'admin/password'),nw);
+    ['sec-cur','sec-new','sec-con'].forEach(i=>document.getElementById(i).value='');
+    toast('Password changed!');
+  };
+
+  /* ─── UTILS ─── */
+  function genPk(name) {
+    const clean=name.replace(/[^a-zA-Z0-9]/g,'').slice(0,10);
+    const r=Array.from({length:14},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');
+    return clean+r;
+  }
+
+  window.cp = function(text, btn) {
+    navigator.clipboard.writeText(text).catch(()=>{
+      const el=document.createElement('textarea');el.value=text;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);
+    });
+    if(btn){const o=btn.textContent;btn.textContent='Copied!';setTimeout(()=>btn.textContent=o,1600);}
+    else toast('Copied!','info');
+  };
+
+  window.toast = function(msg, type='') {
+    const w=document.getElementById('toastWrap');
+    const t=document.createElement('div');
+    t.className='toast'+(type==='err'?' err':type==='info'?' info':'');
+    const ic={err:'❌','info':'ℹ️','':'✅'}[type]||'✅';
+    t.innerHTML=`<span>${ic}</span> ${msg}`;
+    w.appendChild(t); setTimeout(()=>t.remove(),3200);
+  };
+
+  function v(id){return document.getElementById(id).value.trim();}
+  function gv(id,val){document.getElementById(id).value=val;}
+  function esc(s){if(s==null)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+  // Close modals on overlay click
+  ['custModal','ordModal'].forEach(id=>{
+    document.getElementById(id).addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('show');});
+  });
+</script>
+</body>
+</html>
