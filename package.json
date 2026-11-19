@@ -1,0 +1,16 @@
+{
+  "name": "service-bd-smm-panel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SMM panel — Express + Firebase Realtime DB, deployable on Vercel",
+  "main": "api/server.js",
+  "scripts": {
+    "start": "node api/server.js",
+    "dev": "node api/server.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.21.2",
+    "firebase-admin": "^13.0.0"
+  }
+}
