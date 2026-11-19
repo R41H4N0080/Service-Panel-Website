@@ -332,6 +332,7 @@ app.post('/api/order', rl('order', 20, 60e3), auth, loadUser, h(async (req, res)
 
   const uid = req.user.uid;
   const bal = await db().ref('users/' + uid + '/balance').transaction((b) => {
+    if (b === null) return b; // প্রথম কলে ক্যাশ খালি থাকে; সার্ভারের আসল মান দিয়ে রিট্রাই হবে
     b = num(b); if (b < total) return; return round2(b - total);
   });
   if (!bal.committed) throw new HttpError(402, 'ওয়ালেটে পর্যাপ্ত ব্যালেন্স নেই। আগে Add Money করুন।');
@@ -544,7 +545,7 @@ app.post('/api/admin/deposit/:id', A, h(async (req, res) => {
   if (!d) throw new HttpError(404, 'ডিপোজিট পাওয়া যায়নি');
   const action = req.body.action === 'approve' ? 'approved' : req.body.action === 'reject' ? 'rejected' : null;
   if (!action) throw bad('অ্যাকশন ভুল');
-  const lock = await ref.child('status').transaction((v) => (v === 'pending' ? action : undefined));
+  const lock = await ref.child('status').transaction((v) => (v === null ? v : (v === 'pending' ? action : undefined)));
   if (!lock.committed) throw bad('এই ডিপোজিট আগেই প্রসেস করা হয়েছে');
   await ref.update({ note: str(req.body.note, 200), processedAt: Date.now() });
   if (action === 'approved') {
@@ -575,7 +576,7 @@ app.post('/api/admin/user/:uid/balance', A, h(async (req, res) => {
   if (!u) throw new HttpError(404, 'ইউজার পাওয়া যায়নি');
   const sub = req.body.type === 'deduct';
   if (sub) {
-    const r = await db().ref('users/' + uid + '/balance').transaction((b) => { b = num(b); if (b < amount) return; return round2(b - amount); });
+    const r = await db().ref('users/' + uid + '/balance').transaction((b) => { if (b === null) return b; b = num(b); if (b < amount) return; return round2(b - amount); });
     if (!r.committed) throw bad('ইউজারের ব্যালেন্স কম');
   } else {
     await creditUser(uid, amount);
