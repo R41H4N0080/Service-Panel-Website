@@ -104,9 +104,10 @@ const DEFAULT_SETTINGS = {
   payments: { bkash: '', nagad: '', rocket: '' },
   payNote: 'Send Money করে নিচের ফর্মে Transaction ID ও আপনার নম্বর দিন। এডমিন যাচাই করে ব্যালেন্স যোগ করে দিবে।',
   covers: [
-    { title: 'Fast & Cheap<br>Social Services', sub: 'Facebook • Instagram • TikTok', icon: 'fas fa-rocket', src: '' },
-    { title: 'Grow Your<br>Social Presence', sub: 'পাসওয়ার্ড ছাড়াই নিরাপদ সার্ভিস', icon: 'fab fa-instagram', src: '' },
-    { title: '24/7 Live<br>Support', sub: 'যেকোনো সমস্যায় WhatsApp / Telegram', icon: 'fas fa-headset', src: '' }
+     
+    { title: 'Fast & Cheap<br>Social Services', sub: 'Facebook • Instagram • TikTok', icon: 'fas fa-rocket', src: 'img/cover-1.jpg' },
+    { title: 'Grow Your<br>Social Presence', sub: 'পাসওয়ার্ড ছাড়াই নিরাপদ সার্ভিস', icon: 'fab fa-instagram', src: 'img/cover-2.jpg' },
+    { title: '24/7 Live<br>Support', sub: 'যেকোনো সমস্যায় WhatsApp / Telegram', icon: 'fas fa-headset', src: 'img/cover-3.jpg' }
   ],
   pages: { about: '', terms: '', privacy: '', refund: '' }
 };
