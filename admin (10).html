@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin Panel</title>
+<link rel="icon" href="/img/logo.png">
+<link rel="shortcut icon" href="/img/logo.png">
+<link rel="apple-touch-icon" href="/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root { --primary:#FF6B00; --primary-light:#FF8A00; --primary-dark:#E65C00; --glow:0 8px 25px rgba(255,107,0,.4);
+  --bg:#F8F9FA; --card:#fff; --text:#1F2937; --muted:#6B7280; --light:#9CA3AF; --border:#E5E7EB; --tint:#FFF7ED; --tint2:#FFEDD5;
+  --success:#10B981; --danger:#EF4444; --warning:#F59E0B; --info:#3B82F6; --sh:0 2px 8px rgba(0,0,0,.04); --shm:0 6px 20px rgba(0,0,0,.08);
+  --r:14px; --rl:20px; --side:250px; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { background:var(--bg); color:var(--text); font-family:'Poppins','Hind Siliguri',sans-serif; font-size:14px; }
+button,input,select,textarea { font-family:inherit; }
+::-webkit-scrollbar { width:6px; height:6px; } ::-webkit-scrollbar-thumb { background:#D1D5DB; border-radius:10px; }
+.hide { display:none !important; }
+
+/* LOGIN */
+.login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; background:#FFF7ED; background-image:radial-gradient(circle at 0 0,#FFEDD5,transparent 50%),radial-gradient(circle at 100% 100%,#FFEDD5,transparent 50%); }
+.login-card { width:100%; max-width:380px; background:#fff; border-radius:24px; padding:38px 26px 28px; text-align:center; border:1px solid var(--tint2); box-shadow:0 20px 40px rgba(255,107,0,.1); }
+.login-logo { width:84px; height:84px; border-radius:50%; margin:0 auto 18px; background:#FFF3E0; border:4px solid #FFD700; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(255,215,0,.4); overflow:hidden; }
+.login-logo img { width:100%; height:100%; object-fit:cover; } .login-logo i { font-size:32px; color:var(--primary); }
+.login-card h1 { font-size:22px; font-weight:900; } .login-card h1 span { color:var(--primary); }
+.login-card p { color:var(--muted); font-size:13px; font-weight:500; margin:6px 0 20px; }
+.pw { position:relative; } .pw i { position:absolute; right:18px; top:17px; color:var(--light); cursor:pointer; }
+.login-card input { width:100%; padding:15px 46px 15px 18px; border:2px solid var(--border); border-radius:50px; font-size:15px; font-weight:600; background:#F8F9FA; outline:none; text-align:center; margin-bottom:12px; }
+.login-card input:focus { border-color:var(--primary); background:#fff; }
+.err { color:var(--danger); font-size:12.5px; font-weight:700; margin:-2px 0 10px; min-height:0; }
+
+/* BUTTONS */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:11px 18px; border-radius:12px; border:none; font-weight:800; font-size:13px; cursor:pointer; transition:.2s; white-space:nowrap; }
+.btn:active { transform:scale(.97); } .btn:disabled { opacity:.55; cursor:not-allowed; }
+.btn-p { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; box-shadow:0 4px 14px rgba(255,107,0,.3); }
+.btn-g { background:#fff; color:var(--text); border:2px solid var(--border); }
+.btn-ok { background:#ECFDF5; color:#059669; border:1.5px solid #D1FAE5; } .btn-no { background:#FEF2F2; color:#DC2626; border:1.5px solid #FEE2E2; }
+.btn-sm { padding:7px 12px; font-size:12px; border-radius:10px; } .btn-full { width:100%; }
+.btn-big { padding:15px; border-radius:50px; font-size:15px; width:100%; }
+
+/* LAYOUT */
+.app { display:flex; min-height:100vh; }
+.side { width:var(--side); background:#fff; border-right:1px solid var(--border); position:fixed; top:0; bottom:0; left:0; z-index:50; display:flex; flex-direction:column; transition:transform .3s; overflow-y:auto; }
+.side-head { padding:20px 18px; display:flex; align-items:center; gap:11px; border-bottom:1px solid #F3F4F6; }
+.side-logo { width:42px; height:42px; border-radius:12px; border:1.5px solid var(--primary-light); overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--tint); color:var(--primary); }
+.side-logo img { width:100%; height:100%; object-fit:cover; }
+.side-head b { font-size:15px; font-weight:800; color:var(--primary-dark); display:block; line-height:1.1; } .side-head small { font-size:10.5px; color:var(--muted); font-weight:700; }
+.nav { padding:14px 12px; flex:1; }
+.nav a { display:flex; align-items:center; gap:13px; padding:12px 14px; border-radius:13px; color:#4B5563; font-weight:700; font-size:14px; cursor:pointer; margin-bottom:4px; transition:.2s; position:relative; }
+.nav a i { width:20px; text-align:center; font-size:16px; color:#6B7280; }
+.nav a:hover { background:var(--tint); }
+.nav a.active { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; box-shadow:var(--glow); } .nav a.active i { color:#fff; }
+.nav .dot { margin-left:auto; background:var(--danger); color:#fff; border-radius:20px; font-size:11px; padding:2px 8px; font-weight:800; }
+.side-foot { padding:14px 16px 20px; border-top:1px solid #F3F4F6; display:grid; gap:8px; }
+.main { margin-left:var(--side); flex:1; min-width:0; }
+.top { position:sticky; top:0; z-index:40; background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border-bottom:1px solid rgba(0,0,0,.05); padding:13px 22px; display:flex; align-items:center; gap:14px; }
+.top h2 { font-size:19px; font-weight:900; flex:1; }
+.burger { display:none; font-size:21px; cursor:pointer; padding:4px; }
+.content { padding:22px; max-width:1200px; }
+.overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); backdrop-filter:blur(4px); z-index:45; display:none; } .overlay.show { display:block; }
+
+/* CARDS */
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-bottom:22px; }
+.stat { background:#fff; border:1px solid var(--border); border-radius:var(--rl); padding:18px; box-shadow:var(--sh); display:flex; gap:14px; align-items:center; }
+.stat .si { width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.stat small { color:var(--muted); font-weight:700; font-size:11.5px; display:block; } .stat b { font-size:21px; font-weight:900; }
+.card { background:#fff; border:1px solid var(--border); border-radius:var(--rl); box-shadow:var(--sh); margin-bottom:20px; overflow:hidden; }
+.card-h { padding:16px 20px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:12px; flex-wrap:wrap; } .card-h h3 { font-size:16px; font-weight:800; flex:1; }
+.card-b { padding:20px; }
+.tools { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
+.tools input,.tools select,.fi,.fs,.ft { padding:11px 14px; border:2px solid var(--border); border-radius:12px; font-size:13.5px; font-weight:600; background:#F8F9FA; outline:none; transition:.2s; }
+.tools input:focus,.tools select:focus,.fi:focus,.fs:focus,.ft:focus { border-color:var(--primary); background:#fff; box-shadow:0 0 0 4px rgba(255,107,0,.1); }
+.tools input { flex:1; min-width:160px; }
+.tbl-wrap { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; min-width:640px; }
+th { text-align:left; font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; padding:12px 16px; background:#F9FAFB; border-bottom:1px solid var(--border); white-space:nowrap; }
+td { padding:13px 16px; border-bottom:1px solid #F3F4F6; font-weight:600; font-size:13px; vertical-align:middle; }
+tr:last-child td { border-bottom:none; } tbody tr.click { cursor:pointer; } tbody tr.click:hover { background:var(--tint); }
+.cell-main { font-weight:800; max-width:300px; word-break:break-word; line-height:1.4; } .cell-sub { font-size:11.5px; color:var(--muted); font-weight:600; margin-top:2px; word-break:break-all; }
+.acts { display:flex; gap:6px; flex-wrap:wrap; }
+.empty { text-align:center; color:var(--muted); font-weight:600; padding:40px 10px; } .empty i { display:block; font-size:34px; color:#D1D5DB; margin-bottom:10px; }
+.pill { padding:4px 10px; border-radius:8px; font-size:11px; font-weight:800; color:#fff; text-transform:uppercase; display:inline-block; white-space:nowrap; }
+.pill.Pending,.pill.pending { background:var(--warning); } .pill.Processing,.pill.InProgress { background:var(--info); } .pill.Completed,.pill.approved { background:var(--success); }
+.pill.Partial { background:#8B5CF6; } .pill.Cancelled,.pill.rejected,.pill.banned { background:var(--danger); }
+.chip { display:inline-block; font-size:11px; font-weight:800; padding:3px 9px; border-radius:20px; margin:1px 3px 1px 0; }
+.chip.ok { background:#ECFDF5; color:#059669; } .chip.warn { background:#FEF2F2; color:#DC2626; } .chip.pl { background:var(--tint); color:var(--primary-dark); }
+.sw { position:relative; width:40px; height:22px; display:inline-block; } .sw input { opacity:0; width:0; height:0; }
+.sw span { position:absolute; inset:0; background:#D1D5DB; border-radius:22px; cursor:pointer; transition:.2s; } .sw span::before { content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+.sw input:checked + span { background:var(--success); } .sw input:checked + span::before { transform:translateX(18px); }
+
+/* MODAL */
+.modal { position:fixed; inset:0; z-index:100; background:rgba(17,24,39,.6); backdrop-filter:blur(6px); display:none; align-items:flex-start; justify-content:center; padding:20px; overflow-y:auto; } .modal.show { display:flex; }
+.mbox { background:#fff; border-radius:var(--rl); width:100%; max-width:600px; margin:auto; box-shadow:0 12px 35px rgba(0,0,0,.2); animation:pop .25s ease; }
+@keyframes pop { from { transform:scale(.95); opacity:0; } to { transform:scale(1); opacity:1; } }
+.mh { padding:18px 22px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; justify-content:space-between; } .mh h3 { font-size:17px; font-weight:900; }
+.mx { width:34px; height:34px; border-radius:50%; border:none; background:#F3F4F6; cursor:pointer; color:#6B7280; }
+.mb { padding:20px 22px; } .mf { padding:14px 22px 20px; display:flex; gap:10px; justify-content:flex-end; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; } .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.f { margin-bottom:14px; } .f label { display:block; font-size:12px; font-weight:800; margin-bottom:6px; } .f small { display:block; color:var(--muted); font-size:11.5px; font-weight:600; margin-top:5px; }
+.fi,.fs,.ft { width:100%; } .ft { resize:vertical; min-height:80px; line-height:1.6; }
+.chk { display:flex; align-items:center; gap:9px; font-weight:700; font-size:13px; padding:10px 0; cursor:pointer; } .chk input { width:18px; height:18px; accent-color:var(--primary); }
+.kv { display:grid; grid-template-columns:110px 1fr; gap:6px 12px; background:#F9FAFB; border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:16px; font-size:13px; }
+.kv span { color:var(--muted); font-weight:700; } .kv b { font-weight:800; word-break:break-all; }
+.set-sec { font-size:13px; font-weight:900; color:var(--primary-dark); text-transform:uppercase; letter-spacing:.5px; margin:22px 0 12px; padding-bottom:8px; border-bottom:1px dashed var(--tint2); } .set-sec:first-child { margin-top:0; }
+
+/* TOAST */
+.toasts { position:fixed; top:16px; right:16px; z-index:300; display:flex; flex-direction:column; gap:10px; max-width:360px; width:calc(100% - 32px); }
+.toast { background:#1F2937; color:#fff; padding:13px 16px; border-radius:14px; font-weight:700; font-size:13.5px; display:flex; gap:10px; align-items:center; box-shadow:var(--shm); animation:pop .25s; }
+.toast.success i { color:#34D399; } .toast.error i { color:#F87171; }
+
+@media (max-width:900px) {
+  .side { transform:translateX(-100%); box-shadow:5px 0 30px rgba(0,0,0,.15); } .side.show { transform:none; }
+  .main { margin-left:0; } .burger { display:block; } .content { padding:16px; } .top { padding:12px 16px; }
+  .grid2,.grid3 { grid-template-columns:1fr; } .stats { grid-template-columns:1fr 1fr; } .stat { padding:14px; gap:10px; } .stat b { font-size:18px; }
+}
+
+.mbox.wide { max-width: 760px; }
+.gwgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+.gwc { background: #fff; border: 1px solid var(--border); border-radius: var(--rl); padding: 18px; box-shadow: var(--sh); transition: .2s; }
+.gwc.off { opacity: .6; }
+.gwc-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.gwc-name { font-weight: 900; font-size: 15px; }
+.gwc-det { background: #F9FAFB; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-size: 12.5px; }
+.gwc-det div { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; } .gwc-det span { color: var(--muted); font-weight: 700; } .gwc-det b { word-break: break-all; text-align: right; }
+.gw-ic { position: relative; width: 46px; height: 46px; border-radius: 13px; background: var(--gc, #FF6B00); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 900; font-size: 19px; overflow: hidden; flex-shrink: 0; }
+.gw-ic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #fff; padding: 4px; }
+.gw-ic.big { width: 50px; height: 50px; }
+.imgrow { display: flex; gap: 8px; } .imgrow .fi { flex: 1; min-width: 0; }
+.pv { margin-top: 8px; display: flex; align-items: center; gap: 10px; min-height: 40px; } .pv img { max-height: 84px; max-width: 160px; border: 1px solid var(--border); border-radius: 10px; padding: 4px; background: #fff; } .pv small { color: var(--muted); font-weight: 600; }
+.chat { display: flex; flex-direction: column; gap: 10px; max-height: 42vh; overflow-y: auto; padding: 8px; background: #FAFAFA; border: 1px solid var(--border); border-radius: 14px; }
+.bub { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 13.5px; font-weight: 500; line-height: 1.6; word-break: break-word; }
+.bub .who { font-size: 11px; font-weight: 800; margin-bottom: 3px; opacity: .85; } .bub small { display: block; font-size: 10.5px; opacity: .7; margin-top: 5px; font-weight: 600; }
+.bub.me { align-self: flex-end; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; border-bottom-right-radius: 4px; }
+.bub.adm { align-self: flex-start; background: #fff; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+.quick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.qchip { border: 1.5px solid var(--tint2); background: var(--tint); color: var(--primary-dark); border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.qchip:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+code { background: #F3F4F6; padding: 1px 6px; border-radius: 6px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <form class="login-card" onsubmit="doLogin(event)">
+    <div class="login-logo"><img src="img/logo.png" alt="" onerror="this.remove();this.parentNode.innerHTML='<i class=&quot;fas fa-user-shield&quot;></i>'"></div>
+    <h1><span>Admin</span> Panel</h1>
+    <p>ম্যানেজমেন্ট এক্সেসের জন্য পাসওয়ার্ড দিন</p>
+    <div class="pw"><input type="password" id="pw" placeholder="Admin Password" autocomplete="current-password" autofocus><i class="fas fa-eye" onclick="var p=document.getElementById('pw');p.type=p.type==='password'?'text':'password'"></i></div>
+    <div class="err" id="loginErr"></div>
+    <button class="btn btn-p btn-big" id="loginBtn" type="submit"><i class="fas fa-lock-open"></i> Login</button>
+  </form>
+</div>
+
+<!-- APP -->
+<div class="app hide" id="app">
+  <div class="overlay" id="overlay" onclick="toggleSide(false)"></div>
+  <aside class="side" id="side">
+    <div class="side-head"><div class="side-logo"><img src="img/logo.png" alt="" onerror="this.remove()"></div><div><b id="sBrand">Admin</b><small>CONTROL PANEL</small></div></div>
+    <nav class="nav" id="nav">
+      <a data-p="dashboard"><i class="fas fa-chart-pie"></i> Dashboard</a>
+      <a data-p="orders"><i class="fas fa-receipt"></i> Orders <span class="dot hide" id="dotOrders"></span></a>
+      <a data-p="deposits"><i class="fas fa-money-bill-transfer"></i> Deposits <span class="dot hide" id="dotDep"></span></a>
+      <a data-p="gateways"><i class="fas fa-credit-card"></i> Gateways</a>
+      <a data-p="tickets"><i class="fas fa-headset"></i> Tickets <span class="dot hide" id="dotTk"></span></a>
+      <a data-p="services"><i class="fas fa-boxes-stacked"></i> Services</a>
+      <a data-p="categories"><i class="fas fa-layer-group"></i> Categories</a>
+      <a data-p="users"><i class="fas fa-users"></i> Users</a>
+      <a data-p="settings"><i class="fas fa-gear"></i> Settings</a>
+    </nav>
+    <div class="side-foot">
+      <a href="/" target="_blank" class="btn btn-g btn-full"><i class="fas fa-arrow-up-right-from-square"></i> সাইট দেখুন</a>
+      <button class="btn btn-no btn-full" onclick="logout()"><i class="fas fa-power-off"></i> Logout</button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="top"><i class="fas fa-bars burger" onclick="toggleSide(true)"></i><h2 id="pageTitle">Dashboard</h2><button class="btn btn-g btn-sm" onclick="route()"><i class="fas fa-rotate"></i> Refresh</button></div>
+    <div class="content" id="view"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal" onmousedown="if(event.target===this)closeModal()"><div class="mbox" id="mbox"></div></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+const API = '/api';
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => '৳' + (Math.round(Number(n || 0) * 100) / 100).toLocaleString('en-US', { maximumFractionDigits: 2 });
+const fmt = ts => ts ? new Date(ts).toLocaleString('en-GB', { day:'2-digit', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit' }) : '-';
+const cls = s => String(s).replace(/[^A-Za-z]/g, '');
+const REFILLS = [['none','No Refill'],['nodrop','Non Drop'],['7','7 Days Refill'],['15','15 Days Refill'],['30','30 Days Refill'],['60','60 Days Refill'],['90','90 Days Refill'],['lifetime','Lifetime Refill']];
+const refillLabel = r => (REFILLS.find(x => x[0] === String(r)) || REFILLS[0])[1];
+const refillChip = r => '<span class="chip ' + (r === 'none' || !r ? 'warn' : 'ok') + '">' + esc(refillLabel(r)) + '</span>';
+const STATUSES = ['Pending', 'Processing', 'In Progress', 'Completed', 'Partial', 'Cancelled'];
+
+let TOKEN = sessionStorage.getItem('adm_tk') || '';
+let CAT = { categories: [], services: [] };
+let SET = null;
+let cur = 'dashboard';
+
+function toast(m, t) { const e = document.createElement('div'); e.className = 'toast ' + (t || 'success'); e.innerHTML = '<i class="fas ' + (t === 'error' ? 'fa-circle-xmark' : 'fa-circle-check') + '"></i><span>' + esc(m) + '</span>'; $('toasts').appendChild(e); setTimeout(() => e.remove(), 3200); }
+async function api(path, method, body) {
+  let res;
+  try { res = await fetch(API + path, { method: method || 'GET', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: body ? JSON.stringify(body) : undefined }); }
+  catch (e) { throw new Error('সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না'); }
+  let d = null; try { d = await res.json(); } catch (e) {}
+  if (res.status === 401 && path !== '/admin/login') { logout(true); throw new Error((d && d.error) || 'সেশন শেষ'); }
+  if (!res.ok) throw new Error((d && d.error) || 'সমস্যা (' + res.status + ')');
+  return d;
+}
+
+/* ---------- auth ---------- */
+async function doLogin(ev) {
+  ev.preventDefault(); $('loginErr').textContent = ''; $('loginBtn').disabled = true;
+  try { const r = await api('/admin/login', 'POST', { password: $('pw').value }); TOKEN = r.token; sessionStorage.setItem('adm_tk', TOKEN); start(); }
+  catch (e) { $('loginErr').textContent = e.message; } finally { $('loginBtn').disabled = false; }
+}
+function logout(silent) { clearInterval(window._bt); TOKEN = ''; sessionStorage.removeItem('adm_tk'); $('app').classList.add('hide'); $('loginWrap').classList.remove('hide'); $('pw').value = ''; if (!silent) toast('লগআউট হয়েছে'); }
+async function start() {
+  $('loginWrap').classList.add('hide'); $('app').classList.remove('hide');
+  try { const s = await api('/admin/settings'); SET = s.settings; $('sBrand').textContent = SET.brand; document.title = SET.brand + ' — Admin'; } catch (e) { return; }
+  route();
+  clearInterval(window._bt); badges(); window._bt = setInterval(() => { if (!document.hidden && TOKEN) badges(); }, 30000);
+}
+async function badges() { try { const b = await api('/admin/badges'); setDot('dotOrders', b.activeOrders); setDot('dotDep', b.pendingDeposits); setDot('dotTk', b.openTickets); } catch (e) {} }
+
+/* ---------- router ---------- */
+const PAGES = { dashboard: pDash, orders: pOrders, deposits: pDeposits, gateways: pGateways, tickets: pTickets, services: pServices, categories: pCategories, users: pUsers, settings: pSettings };
+const TITLES = { dashboard: 'Dashboard', orders: 'Orders', deposits: 'Deposits', gateways: 'Payment Gateways', tickets: 'Support Tickets', services: 'Services', categories: 'Categories', users: 'Users', settings: 'Settings' };
+document.getElementById('nav').addEventListener('click', e => { const a = e.target.closest('a[data-p]'); if (a) { location.hash = a.dataset.p; toggleSide(false); } });
+window.addEventListener('hashchange', route);
+function toggleSide(on) { $('side').classList.toggle('show', on); $('overlay').classList.toggle('show', on); }
+async function route() {
+  if (!TOKEN) return;
+  stopTkPoll();
+  cur = (location.hash || '#dashboard').slice(1); if (!PAGES[cur]) cur = 'dashboard';
+  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('active', a.dataset.p === cur));
+  $('pageTitle').textContent = TITLES[cur];
+  $('view').innerHTML = '<div class="empty"><i class="fas fa-spinner fa-spin"></i>লোড হচ্ছে...</div>';
+  try { await PAGES[cur](); } catch (e) { $('view').innerHTML = '<div class="empty"><i class="fas fa-triangle-exclamation"></i>' + esc(e.message) + '</div>'; }
+}
+function setDot(id, n) { const e = $(id); e.textContent = n; e.classList.toggle('hide', !n); }
+
+/* ---------- modal ---------- */
+function openModal(html, wide) { $('mbox').className = 'mbox' + (wide ? ' wide' : ''); $('mbox').innerHTML = html; $('modal').classList.add('show'); }
+function closeModal() { $('modal').classList.remove('show'); if (typeof stopTkPoll === 'function') stopTkPoll(); }
+const mHead = t => '<div class="mh"><h3>' + t + '</h3><button class="mx" onclick="closeModal()"><i class="fas fa-times"></i></button></div>';
+
+/* ==========================================================================
+   DASHBOARD
+   ========================================================================== */
+async function pDash() {
+  const s = await api('/admin/stats');
+  setDot('dotOrders', s.pendingOrders); setDot('dotDep', s.pendingDeposits); window._recent = s.recent; setDot('dotTk', s.openTickets);
+  const st = (ic, bg, fg, l, v) => '<div class="stat"><div class="si" style="background:' + bg + ';color:' + fg + '"><i class="fas ' + ic + '"></i></div><div><small>' + l + '</small><b>' + v + '</b></div></div>';
+  $('view').innerHTML =
+    '<div class="stats">' +
+      st('fa-sack-dollar', '#D1FAE5', '#059669', 'Total Revenue', money(s.revenue)) +
+      st('fa-wallet', '#FFEDD5', '#EA580C', 'Total Deposited', money(s.deposited)) +
+      st('fa-receipt', '#DBEAFE', '#2563EB', 'Total Orders', s.orders) +
+      st('fa-calendar-day', '#EDE9FE', '#7C3AED', 'Orders Today', s.ordersToday) +
+      st('fa-hourglass-half', '#FEF3C7', '#D97706', 'Active Orders', s.pendingOrders) +
+      st('fa-money-bill-transfer', '#FCE7F3', '#DB2777', 'Pending Deposits', s.pendingDeposits) +
+      st('fa-rotate', '#CCFBF1', '#0D9488', 'Refill Requests', s.refillRequests) +
+      st('fa-headset', '#FEE2E2', '#DC2626', 'Open Tickets', s.openTickets) +
+      st('fa-users', '#E0F2FE', '#0284C7', 'Users', s.users) +
+    '</div>' +
+    '<div class="card"><div class="card-h"><h3>সাম্প্রতিক অর্ডার</h3><a class="btn btn-g btn-sm" href="#orders">সব দেখুন</a></div><div class="tbl-wrap">' + ordersTable(s.recent) + '</div></div>';
+}
+
+/* ==========================================================================
+   ORDERS
+   ========================================================================== */
+let ordList = [];
+function ordersTable(list) {
+  if (!list.length) return '<div class="empty"><i class="fas fa-receipt"></i>কোনো অর্ডার নেই</div>';
+  return '<table><thead><tr><th>ID</th><th>User</th><th>Service</th><th>Qty</th><th>Total</th><th>Status</th><th>Date</th></tr></thead><tbody>' +
+    list.map(o => '<tr class="click" onclick="openOrder(\'' + esc(o.id) + '\')"><td><b>#' + esc(o.no) + '</b></td>' +
+      '<td><div class="cell-main">' + esc(o.userName) + '</div><div class="cell-sub">' + esc(o.userEmail) + '</div></td>' +
+      '<td><div class="cell-main">' + esc(String(o.service).split('|')[0]) + '</div><div class="cell-sub">' + esc(o.link) + '</div></td>' +
+      '<td>' + Number(o.qty).toLocaleString() + '</td><td><b>' + money(o.total) + '</b></td>' +
+      '<td><span class="pill ' + cls(o.status) + '">' + esc(o.status) + '</span>' + (o.refillRequest && o.refillRequest.status === 'requested' ? ' <span class="chip ok">Refill</span>' : '') + '</td>' +
+      '<td style="white-space:nowrap">' + fmt(o.ts) + '</td></tr>').join('') + '</tbody></table>';
+}
+async function pOrders() {
+  $('view').innerHTML =
+    '<div class="tools"><input id="oq" placeholder="অর্ডার ID / ইউজার / লিংক সার্চ..." onkeydown="if(event.key===\'Enter\')loadOrders()">' +
+    '<select class="fs" id="os" style="width:auto" onchange="loadOrders()"><option value="">সব স্ট্যাটাস</option>' + STATUSES.map(s => '<option>' + s + '</option>').join('') + '<option value="Refill">Refill Requests</option></select>' +
+    '<button class="btn btn-p" onclick="loadOrders()"><i class="fas fa-search"></i> Search</button></div>' +
+    '<div class="card"><div class="tbl-wrap" id="ordBox"></div></div>';
+  await loadOrders();
+}
+async function loadOrders() {
+  const q = ($('oq') || {}).value || '', st = ($('os') || {}).value || '';
+  const r = await api('/admin/orders?status=' + encodeURIComponent(st) + '&q=' + encodeURIComponent(q));
+  ordList = r.orders; $('ordBox').innerHTML = ordersTable(ordList);
+  if (!st && !q) setDot('dotOrders', ordList.filter(o => ['Pending', 'Processing', 'In Progress'].includes(o.status)).length);
+}
+function openOrder(id) {
+  const o = ordList.find(x => x.id === id) || (window._recent || []).find(x => x.id === id);
+  if (!o) return;
+  const rr = o.refillRequest;
+  openModal(mHead('Order #' + esc(o.no)) +
+    '<div class="mb"><div class="kv">' +
+      '<span>User</span><b>' + esc(o.userName) + ' (' + esc(o.userEmail) + ')</b>' +
+      '<span>Service</span><b>' + esc(o.service) + '</b>' +
+      '<span>Link</span><b><a href="' + (/^https?:\/\//i.test(o.link) ? esc(o.link) : '#') + '" target="_blank" rel="noopener" style="color:var(--primary-dark)">' + esc(o.link) + '</a></b>' +
+      '<span>Quantity</span><b>' + Number(o.qty).toLocaleString() + '</b>' +
+      '<span>Total</span><b>' + money(o.total) + (o.refundAmount ? ' (Refunded ' + money(o.refundAmount) + ')' : '') + '</b>' +
+      '<span>Refill</span><b>' + esc(refillLabel(o.refill)) + '</b>' +
+      '<span>Date</span><b>' + fmt(o.ts) + '</b></div>' +
+    (rr ? '<div class="kv" style="background:#ECFDF5;border-color:#D1FAE5"><span>Refill Req</span><b>' + esc(rr.status) + ' • ' + fmt(rr.ts) + '</b></div>' : '') +
+    '<div class="grid2"><div class="f"><label>Status</label><select class="fs" id="mStatus" onchange="$(\'refBox\').classList.toggle(\'hide\',this.value!==\'Partial\')">' + STATUSES.map(s => '<option ' + (s === o.status ? 'selected' : '') + '>' + s + '</option>').join('') + '</select><small>Cancelled দিলে পুরো টাকা অটো ফেরত যাবে</small></div>' +
+    '<div class="f"><label>Start Count</label><input class="fi" id="mStart" value="' + esc(o.startCount || '') + '"></div></div>' +
+    '<div class="f hide" id="refBox"><label>Partial Refund Amount (৳)</label><input class="fi" type="number" id="mRef" min="0" step="0.01" max="' + o.total + '"></div>' +
+    '<div class="f"><label>ইউজারকে নোট (ঐচ্ছিক)</label><input class="fi" id="mNote" maxlength="300" value="' + esc(o.note || '') + '"></div>' +
+    (rr && rr.status === 'requested' ? '<label class="chk"><input type="checkbox" id="mRefillDone"> Refill সম্পন্ন হয়েছে</label>' : '') +
+    '</div><div class="mf"><button class="btn btn-g" onclick="closeModal()">Close</button><button class="btn btn-p" onclick="saveOrder(\'' + esc(o.id) + '\')"><i class="fas fa-floppy-disk"></i> Save</button></div>');
+  $('refBox').classList.toggle('hide', o.status !== 'Partial');
+}
+async function saveOrder(id) {
+  try {
+    await api('/admin/order/' + encodeURIComponent(id), 'POST', { status: $('mStatus').value, startCount: $('mStart').value, note: $('mNote').value, refundAmount: $('mRef').value, refillDone: !!($('mRefillDone') && $('mRefillDone').checked) });
+    closeModal(); toast('অর্ডার আপডেট হয়েছে'); route();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ==========================================================================
+   DEPOSITS
+   ========================================================================== */
+let depList = [];
+async function pDeposits() {
+  $('view').innerHTML = '<div class="tools"><select class="fs" id="ds" style="width:auto" onchange="loadDeps()"><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="">সব</option></select></div><div class="card"><div class="tbl-wrap" id="depBox"></div></div>';
+  await loadDeps();
+}
+async function loadDeps() {
+  const r = await api('/admin/deposits?status=' + encodeURIComponent($('ds').value));
+  depList = r.deposits;
+  if ($('ds').value === 'pending') setDot('dotDep', r.deposits.length);
+  $('depBox').innerHTML = !r.deposits.length ? '<div class="empty"><i class="fas fa-money-bill-transfer"></i>কোনো ডিপোজিট নেই</div>' :
+    '<table><thead><tr><th>User</th><th>Amount</th><th>Method</th><th>Sender / TrxID</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody>' +
+    r.deposits.map(d => '<tr><td><div class="cell-main">' + esc(d.userName) + '</div><div class="cell-sub">' + esc(d.userEmail) + '</div></td><td><b>' + money(d.amount) + '</b>' + (d.bonusPct ? '<div class="cell-sub">Bonus ' + esc(d.bonusPct) + '%</div>' : '') + '</td><td>' + esc(d.methodName || String(d.method).toUpperCase()) + '</td>' +
+      '<td><div class="cell-main">' + esc(d.trxId || '—') + '</div><div class="cell-sub">' + esc(d.sender || '') + '</div></td><td><span class="pill ' + cls(d.status) + '">' + esc(d.status) + '</span>' + (d.note ? '<div class="cell-sub">' + esc(d.note) + '</div>' : '') + '</td><td style="white-space:nowrap">' + fmt(d.ts) + '</td>' +
+      '<td>' + (d.status === 'pending' ? '<div class="acts"><button class="btn btn-ok btn-sm" onclick="approveDep(\'' + esc(d.id) + '\')"><i class="fas fa-check"></i> Approve</button><button class="btn btn-no btn-sm" onclick="rejectDep(\'' + esc(d.id) + '\')"><i class="fas fa-xmark"></i></button></div>' : '') + '</td></tr>').join('') + '</tbody></table>';
+}
+function approveDep(id) {
+  const d = depList.find(x => x.id === id); if (!d) return;
+  const auto = Math.round(Number(d.amount) * Number(d.bonusPct || 0)) / 100;
+  openModal(mHead('Deposit Approve') + '<div class="mb"><p style="font-weight:600;margin-bottom:14px"><b>' + esc(d.userName) + '</b> এর ওয়ালেটে <b>' + money(d.amount) + '</b> যোগ হবে (' + esc(d.methodName || d.method) + ').' + (d.bonusPct ? ' এই মেথডে ' + esc(d.bonusPct) + '% বোনাস সেট আছে।' : '') + '</p><div class="f"><label>Bonus (৳) — ঐচ্ছিক</label><input class="fi" type="number" id="bonus" min="0" step="0.01" value="' + auto + '"></div></div>' +
+    '<div class="mf"><button class="btn btn-g" onclick="closeModal()">Cancel</button><button class="btn btn-ok" onclick="doDep(\'' + esc(id) + '\',\'approve\')"><i class="fas fa-check"></i> Approve</button></div>');
+}
+async function rejectDep(id) {
+  const note = prompt('Reject এর কারণ (ইউজার দেখতে পাবে):', 'Transaction যাচাই করা যায়নি'); if (note === null) return;
+  doDep(id, 'reject', note);
+}
+async function doDep(id, action, note) {
+  try { await api('/admin/deposit/' + encodeURIComponent(id), 'POST', { action, note: note || '', bonus: action === 'approve' ? ($('bonus') || {}).value : 0 }); closeModal(); toast(action === 'approve' ? 'ব্যালেন্স যোগ হয়েছে' : 'রিজেক্ট করা হয়েছে'); loadDeps(); }
+  catch (e) { toast(e.message, 'error'); }
+}
+
+/* ==========================================================================
+   GATEWAYS  (পেমেন্ট মেথড: নাম, লোগো, QR, বিবরণ, অ্যাকাউন্ট তথ্য, লিমিট, বোনাস)
+   ========================================================================== */
+let GW = [], gState = { logo: '', qr: '' };
+const KINDS = [['mobile', 'Mobile Banking'], ['bank', 'Bank'], ['crypto', 'Crypto'], ['other', 'অন্যান্য']];
+function gwIc(g, big) {
+  return '<span class="gw-ic ' + (big ? 'big' : '') + '" style="--gc:' + esc(g.color || '#FF6B00') + '"><b>' + esc((g.name || '?').trim().charAt(0).toUpperCase()) + '</b>' + (g.logo ? '<img src="' + esc(g.logo) + '" alt="" onerror="this.remove()">' : '') + '</span>';
+}
+async function pGateways() {
+  GW = (await api('/admin/gateways')).gateways;
+  $('view').innerHTML = '<div class="tools"><div style="flex:1;color:var(--muted);font-weight:600;font-size:13px">ইউজারের Add Fund পেজে এখানকার চালু মেথডগুলো দেখাবে। লোগো <b>img/</b> ফোল্ডার থেকে (যেমন <code>img/bkash.png</code>) বা আপলোড করে দিন।</div><button class="btn btn-p" onclick="editGw()"><i class="fas fa-plus"></i> নতুন মেথড</button></div>' +
+    (GW.length ? '<div class="gwgrid">' + GW.map(g =>
+      '<div class="gwc ' + (g.enabled ? '' : 'off') + '"><div class="gwc-top">' + gwIc(g, true) + '<div style="flex:1;min-width:0"><div class="gwc-name">' + esc(g.name) + '</div><div class="cell-sub">' + esc((KINDS.find(k => k[0] === g.kind) || KINDS[0])[1]) + ' • ID: ' + esc(g.id) + '</div></div>' +
+      '<label class="sw"><input type="checkbox" ' + (g.enabled ? 'checked' : '') + ' onchange="togGw(\'' + esc(g.id) + '\',this.checked)"><span></span></label></div>' +
+      '<div class="gwc-det">' + ((g.details || []).slice(0, 3).map(d => '<div><span>' + esc(d.label) + '</span><b>' + esc(d.value) + '</b></div>').join('') || '<div style="color:var(--danger);font-weight:700">অ্যাকাউন্ট তথ্য দেওয়া নেই</div>') + '</div>' +
+      '<div style="margin:8px 0">' + (g.qr ? '<span class="chip ok">QR আছে</span>' : '') + (g.bonus > 0 ? '<span class="chip pl">' + g.bonus + '% Bonus</span>' : '') + (g.min > 0 ? '<span class="chip pl">Min ৳' + g.min + '</span>' : '') + (g.max > 0 ? '<span class="chip pl">Max ৳' + g.max + '</span>' : '') + '</div>' +
+      '<div class="acts"><button class="btn btn-g btn-sm" onclick="editGw(\'' + esc(g.id) + '\')"><i class="fas fa-pen"></i> Edit</button><button class="btn btn-no btn-sm" onclick="delGw(\'' + esc(g.id) + '\')"><i class="fas fa-trash"></i></button></div></div>').join('') + '</div>'
+      : '<div class="card"><div class="empty"><i class="fas fa-credit-card"></i>কোনো পেমেন্ট মেথড নেই</div></div>');
+}
+async function togGw(id, v) { try { await api('/admin/gateway/' + encodeURIComponent(id) + '/toggle', 'POST', { value: v }); toast('আপডেট হয়েছে'); pGateways(); } catch (e) { toast(e.message, 'error'); } }
+async function delGw(id) { if (!confirm('মেথডটি ডিলেট করবেন? (আগের ডিপোজিট ঠিক থাকবে)')) return; try { await api('/admin/gateway/' + encodeURIComponent(id), 'DELETE'); toast('ডিলেট হয়েছে'); pGateways(); } catch (e) { toast(e.message, 'error'); } }
+
+function imgPrev(which) {
+  const v = gState[which], box = $('pv_' + which);
+  box.innerHTML = v ? '<img src="' + esc(v) + '" alt="" onerror="this.replaceWith(Object.assign(document.createElement(\'small\'),{textContent:\'ছবি লোড হচ্ছে না — পাথ/লিংক চেক করুন\'}))"><button type="button" class="btn btn-no btn-sm" onclick="imgClear(\'' + which + '\')"><i class="fas fa-xmark"></i></button>' : '<small>কোনো ছবি নেই</small>';
+}
+function imgTyped(which) { gState[which] = $('in_' + which).value.trim(); imgPrev(which); }
+function imgClear(which) { gState[which] = ''; $('in_' + which).value = ''; imgPrev(which); }
+function imgPick(which, maxDim, fmt) {
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = () => {
+    const f = inp.files[0]; if (!f) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+      const im = new Image();
+      im.onload = () => {
+        let dim = maxDim, out = '';
+        for (let i = 0; i < 4; i++) {
+          const sc = Math.min(1, dim / Math.max(im.width, im.height));
+          const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(im.width * sc)); c.height = Math.max(1, Math.round(im.height * sc));
+          c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+          out = c.toDataURL(fmt, 0.9);
+          if (out.length < 170000) break; dim = Math.round(dim * 0.7);
+        }
+        if (out.length >= 230000) return toast('ছবিটি অনেক বড়, ছোট ছবি দিন', 'error');
+        gState[which] = out; $('in_' + which).value = ''; $('in_' + which).placeholder = 'আপলোড করা ছবি ব্যবহার হচ্ছে'; imgPrev(which);
+      };
+      im.onerror = () => toast('ছবি পড়া যায়নি', 'error'); im.src = fr.result;
+    };
+    fr.readAsDataURL(f);
+  };
+  inp.click();
+}
+function editGw(id) {
+  const g = GW.find(x => x.id === id) || { id: '', name: '', kind: 'mobile', logo: '', qr: '', color: '#FF6B00', details: [{ label: 'Send Money', value: '' }], desc: '', min: 0, max: 0, bonus: 0, askSender: true, askTrx: true, enabled: true, order: GW.length + 1 };
+  gState = { logo: g.logo || '', qr: g.qr || '' };
+  const isData = v => /^data:/.test(v || '');
+  openModal(mHead(id ? 'মেথড এডিট' : 'নতুন পেমেন্ট মেথড') + '<div class="mb">' +
+    '<div class="grid2"><div class="f"><label>মেথডের নাম</label><input class="fi" id="gName" value="' + esc(g.name) + '" placeholder="bKash / Nagad / City Bank"></div>' +
+    '<div class="f"><label>ID (ইংরেজি, একবার দিলে বদলায় না)</label><input class="fi" id="gId" value="' + esc(g.id) + '" ' + (id ? 'disabled' : '') + ' placeholder="bkash"></div></div>' +
+    '<div class="grid3"><div class="f"><label>ধরন</label><select class="fs" id="gKind">' + KINDS.map(k => '<option value="' + k[0] + '" ' + (g.kind === k[0] ? 'selected' : '') + '>' + k[1] + '</option>').join('') + '</select></div>' +
+    '<div class="f"><label>থিম রঙ</label><input class="fi" type="color" id="gColor" value="' + esc(g.color) + '" style="padding:4px;height:44px"></div><div class="f"><label>ক্রম</label><input class="fi" type="number" id="gOrder" value="' + esc(g.order) + '"></div></div>' +
+    '<div class="f"><label>লোগো / আইকন</label><div class="imgrow"><input class="fi" id="in_logo" value="' + (isData(g.logo) ? '' : esc(g.logo)) + '" placeholder="' + (isData(g.logo) ? 'আপলোড করা ছবি ব্যবহার হচ্ছে' : 'img/bkash.png অথবা https://...') + '" oninput="imgTyped(\'logo\')"><button type="button" class="btn btn-g" onclick="imgPick(\'logo\',192,\'image/webp\')"><i class="fas fa-upload"></i> আপলোড</button></div><div class="pv" id="pv_logo"></div></div>' +
+    '<div class="f"><label>অ্যাকাউন্ট তথ্য (প্রতি লাইনে একটি — <b>লেবেল: মান</b>)</label><textarea class="ft" id="gDetails" rows="4" placeholder="Send Money: 01XXXXXXXXX&#10;Account Name: Service BD&#10;Bank: City Bank">' + esc((g.details || []).map(d => d.label + ': ' + d.value).join('\n')) + '</textarea><small>প্রতিটি লাইনের পাশে ইউজার Copy বাটন পাবে</small></div>' +
+    '<div class="f"><label>QR কোড (ঐচ্ছিক)</label><div class="imgrow"><input class="fi" id="in_qr" value="' + (isData(g.qr) ? '' : esc(g.qr)) + '" placeholder="' + (isData(g.qr) ? 'আপলোড করা ছবি ব্যবহার হচ্ছে' : 'img/qr-bkash.png অথবা https://...') + '" oninput="imgTyped(\'qr\')"><button type="button" class="btn btn-g" onclick="imgPick(\'qr\',420,\'image/png\')"><i class="fas fa-upload"></i> আপলোড</button></div><div class="pv" id="pv_qr"></div></div>' +
+    '<div class="f"><label>বিবরণ / নির্দেশনা (ইউজারকে দেখাবে)</label><textarea class="ft" id="gDesc" rows="4" placeholder="কীভাবে পেমেন্ট করবেন, কোন অপশন বেছে নেবেন, কত সময় লাগবে...">' + esc(g.desc) + '</textarea></div>' +
+    '<div class="grid3"><div class="f"><label>Min (৳) — 0 = ডিফল্ট</label><input class="fi" type="number" min="0" id="gMin" value="' + g.min + '"></div><div class="f"><label>Max (৳) — 0 = সীমাহীন</label><input class="fi" type="number" min="0" id="gMax" value="' + g.max + '"></div><div class="f"><label>বোনাস %</label><input class="fi" type="number" min="0" max="100" step="0.1" id="gBonus" value="' + g.bonus + '"></div></div>' +
+    '<label class="chk"><input type="checkbox" id="gSender" ' + (g.askSender !== false ? 'checked' : '') + '> ইউজারের কাছে Sender নম্বর/অ্যাকাউন্ট চাইবে</label>' +
+    '<label class="chk"><input type="checkbox" id="gTrx" ' + (g.askTrx !== false ? 'checked' : '') + '> Transaction ID / Reference চাইবে (ডুপ্লিকেট চেক হবে)</label>' +
+    '<label class="chk"><input type="checkbox" id="gEn" ' + (g.enabled !== false ? 'checked' : '') + '> চালু (ইউজারকে দেখাবে)</label>' +
+    '</div><div class="mf"><button class="btn btn-g" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="saveGw(\'' + esc(id || '') + '\')"><i class="fas fa-floppy-disk"></i> Save</button></div>');
+  imgPrev('logo'); imgPrev('qr');
+}
+async function saveGw(id) {
+  const details = $('gDetails').value.split('\n').map(l => l.trim()).filter(Boolean).map(l => { const i = l.indexOf(':'); return i > 0 ? { label: l.slice(0, i).trim(), value: l.slice(i + 1).trim() } : { label: 'Info', value: l }; });
+  try {
+    await api('/admin/gateway', 'POST', { isNew: !id, id: id || $('gId').value, name: $('gName').value, kind: $('gKind').value, color: $('gColor').value, order: $('gOrder').value, logo: gState.logo, qr: gState.qr, details, desc: $('gDesc').value, min: $('gMin').value, max: $('gMax').value, bonus: $('gBonus').value, askSender: $('gSender').checked, askTrx: $('gTrx').checked, enabled: $('gEn').checked });
+    closeModal(); toast('মেথড সেভ হয়েছে'); pGateways();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ==========================================================================
+   TICKETS
+   ========================================================================== */
+const TKC = { order: 'অর্ডার', refill: 'Refill', payment: 'পেমেন্ট', account: 'অ্যাকাউন্ট', other: 'অন্যান্য' };
+let tkThread = null, tkPoll = null, tkLen = -1, tkSt = '', tkPr = '';
+function stopTkPoll() { clearInterval(tkPoll); tkPoll = null; tkThread = null; }
+async function pTickets() {
+  $('view').innerHTML = '<div id="tkCounts" class="stats" style="margin-bottom:16px"></div><div class="tools"><input id="tq" placeholder="টিকেট নং / ইউজার / বিষয় সার্চ..." onkeydown="if(event.key===\'Enter\')loadTk()"><select class="fs" id="ts" style="width:auto" onchange="loadTk()"><option value="">সব স্ট্যাটাস</option><option value="Open" selected>Open</option><option value="Answered">Answered</option><option value="Closed">Closed</option></select><button class="btn btn-p" onclick="loadTk()"><i class="fas fa-search"></i> Search</button></div><div class="card"><div class="tbl-wrap" id="tkBox"></div></div>';
+  await loadTk();
+}
+async function loadTk() {
+  const r = await api('/admin/tickets?status=' + encodeURIComponent($('ts').value) + '&q=' + encodeURIComponent($('tq').value));
+  setDot('dotTk', r.counts.Open);
+  $('tkCounts').innerHTML = [['Open', 'fa-envelope-open-text', '#DBEAFE', '#2563EB'], ['Answered', 'fa-reply', '#D1FAE5', '#059669'], ['Closed', 'fa-lock', '#F3F4F6', '#6B7280']].map(x =>
+    '<div class="stat"><div class="si" style="background:' + x[2] + ';color:' + x[3] + '"><i class="fas ' + x[1] + '"></i></div><div><small>' + x[0] + '</small><b>' + r.counts[x[0]] + '</b></div></div>').join('');
+  $('tkBox').innerHTML = !r.tickets.length ? '<div class="empty"><i class="fas fa-headset"></i>কোনো টিকেট নেই</div>' :
+    '<table><thead><tr><th>#</th><th>User</th><th>Subject</th><th>Priority</th><th>Status</th><th>Last Update</th></tr></thead><tbody>' +
+    r.tickets.map(t => '<tr class="click" onclick="openTk(\'' + esc(t.id) + '\')"><td><b>#' + esc(t.no) + '</b></td><td><div class="cell-main">' + esc(t.userName) + '</div><div class="cell-sub">' + esc(t.userEmail) + '</div></td>' +
+      '<td><div class="cell-main">' + esc(t.subject) + (t.unreadAdmin ? ' <span class="chip warn">নতুন</span>' : '') + '</div><div class="cell-sub">' + esc(TKC[t.category] || '') + (t.orderNo ? ' • অর্ডার #' + esc(t.orderNo) : '') + '</div></td>' +
+      '<td><span class="chip ' + (t.priority === 'High' ? 'warn' : t.priority === 'Low' ? 'pl' : 'ok') + '">' + esc(t.priority) + '</span></td><td><span class="pill ' + cls(t.status) + '">' + esc(t.status) + '</span></td><td style="white-space:nowrap">' + fmt(t.updatedAt) + '<div class="cell-sub">' + (t.lastBy === 'admin' ? 'Support' : 'User') + ' শেষ রিপ্লাই</div></td></tr>').join('') + '</tbody></table>';
+}
+async function openTk(id) {
+  stopTkPoll(); tkThread = id; tkLen = -1; tkSt = ''; tkPr = '';
+  openModal(mHead('টিকেট') + '<div class="mb"><div id="tkH"></div><div class="chat" id="tkM"><div class="empty"><i class="fas fa-spinner fa-spin"></i></div></div>' +
+    '<div id="tkQuick" class="quick"></div><div class="f" style="margin:10px 0 0"><textarea class="ft" id="tkR" rows="3" placeholder="রিপ্লাই লিখুন... (Ctrl+Enter = পাঠান)"></textarea></div></div>' +
+    '<div class="mf" style="flex-wrap:wrap" id="tkBtns"></div>', true);
+  $('tkR').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) tkSend(false); });
+  await tkLoad(true);
+  tkPoll = setInterval(() => { if (!$('modal').classList.contains('show') || tkThread !== id) return stopTkPoll(); if (!document.hidden) tkLoad(false); }, 6000);
+}
+async function tkLoad(first) {
+  if (!tkThread) return;
+  let r; try { r = await api('/admin/ticket/' + encodeURIComponent(tkThread)); } catch (e) { if (first) { closeModal(); toast(e.message, 'error'); } return; }
+  const t = r.ticket, o = r.order;
+  if (first || t.status !== tkSt || t.priority !== tkPr) {
+    tkSt = t.status; tkPr = t.priority;
+    $('tkH').innerHTML = '<div class="kv"><span>টিকেট</span><b>#' + esc(t.no) + ' — ' + esc(t.subject) + '</b><span>User</span><b>' + esc(t.userName) + ' (' + esc(t.userEmail) + ')</b><span>ধরন</span><b>' + esc(TKC[t.category] || '') + '</b>' +
+      (o ? '<span>অর্ডার</span><b>#' + esc(o.no) + ' • ' + esc(o.status) + '<br>' + esc(String(o.service).split('|')[0]) + '<br>' + esc(o.link) + ' • Qty ' + Number(o.qty).toLocaleString() + ' • ' + money(o.total) + '</b>' : '') + '</div>' +
+      '<div class="grid2" style="margin-bottom:12px"><div class="f" style="margin:0"><label>Status</label><select class="fs" onchange="tkUpd({status:this.value})">' + ['Open', 'Answered', 'Closed'].map(s => '<option ' + (s === t.status ? 'selected' : '') + '>' + s + '</option>').join('') + '</select></div>' +
+      '<div class="f" style="margin:0"><label>Priority</label><select class="fs" onchange="tkUpd({priority:this.value})">' + ['Low', 'Normal', 'High'].map(s => '<option ' + (s === t.priority ? 'selected' : '') + '>' + s + '</option>').join('') + '</select></div></div>';
+    $('tkBtns').innerHTML = '<button class="btn btn-no btn-sm" onclick="tkDel()"><i class="fas fa-trash"></i> Delete</button><span style="flex:1"></span><button class="btn btn-g" onclick="closeModal()">Close</button>' +
+      (t.status === 'Closed' ? '<button class="btn btn-ok" onclick="tkUpd({status:\'Open\'})"><i class="fas fa-lock-open"></i> Reopen</button>' : '<button class="btn btn-no" onclick="tkSend(true)"><i class="fas fa-lock"></i> Reply & Close</button>') +
+      '<button class="btn btn-p" onclick="tkSend(false)"><i class="fas fa-paper-plane"></i> Reply</button>';
+    $('tkQuick').innerHTML = ((SET && SET.quickReplies) || []).map((q, i) => '<button type="button" class="qchip" onclick="tkQuick(' + i + ')">' + esc(q.length > 38 ? q.slice(0, 38) + '…' : q) + '</button>').join('');
+  }
+  if (first || r.messages.length !== tkLen) {
+    tkLen = r.messages.length; const box = $('tkM'), near = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+    box.innerHTML = r.messages.map(m => '<div class="bub ' + (m.by === 'admin' ? 'me' : 'adm') + '"><div class="who">' + (m.by === 'admin' ? 'Support (আপনি)' : esc(m.name)) + '</div>' + esc(m.text).replace(/\n/g, '<br>') + '<small>' + fmt(m.ts) + '</small></div>').join('');
+    if (first || near) box.scrollTop = box.scrollHeight;
+  }
+}
+function tkQuick(i) { const q = (SET.quickReplies || [])[i]; if (q) { const a = $('tkR'); a.value = (a.value ? a.value + '\n' : '') + q; a.focus(); } }
+async function tkSend(close) {
+  const text = $('tkR').value.trim(); if (!text && !close) return toast('রিপ্লাই লিখুন', 'error');
+  try { await api('/admin/ticket/' + encodeURIComponent(tkThread) + '/reply', 'POST', { text, close }); $('tkR').value = ''; toast(close ? 'রিপ্লাই দিয়ে ক্লোজ করা হয়েছে' : 'রিপ্লাই পাঠানো হয়েছে'); await tkLoad(true); if (cur === 'tickets') loadTk(); }
+  catch (e) { toast(e.message, 'error'); }
+}
+async function tkUpd(body) { try { await api('/admin/ticket/' + encodeURIComponent(tkThread) + '/update', 'POST', body); toast('আপডেট হয়েছে'); await tkLoad(true); if (cur === 'tickets') loadTk(); } catch (e) { toast(e.message, 'error'); } }
+async function tkDel() { if (!confirm('টিকেট ও সব মেসেজ স্থায়ীভাবে ডিলেট হবে। নিশ্চিত?')) return; try { await api('/admin/ticket/' + encodeURIComponent(tkThread), 'DELETE'); closeModal(); toast('ডিলেট হয়েছে'); if (cur === 'tickets') loadTk(); } catch (e) { toast(e.message, 'error'); } }
+
+/* ==========================================================================
+   SERVICES
+   ========================================================================== */
+async function loadCat() { CAT = await api('/admin/catalog'); }
+const catName = id => (CAT.categories.find(c => c.id === id) || {}).name || id;
+async function pServices() {
+  await loadCat();
+  $('view').innerHTML = '<div class="tools"><input id="sq" placeholder="সার্ভিস সার্চ..." oninput="renderSvcs()"><select class="fs" id="sc" style="width:auto" onchange="renderSvcs()"><option value="">সব ক্যাটাগরি</option>' +
+    CAT.categories.map(c => '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>').join('') + '</select><button class="btn btn-p" onclick="editService()"><i class="fas fa-plus"></i> নতুন সার্ভিস</button></div>' +
+    '<div class="card"><div class="tbl-wrap" id="svcBox"></div></div>';
+  renderSvcs();
+}
+function renderSvcs() {
+  const q = ($('sq').value || '').toLowerCase(), c = $('sc').value;
+  const list = CAT.services.filter(s => (!c || s.cat === c) && (!q || (s.name + ' ' + s.id).toLowerCase().includes(q)));
+  $('svcBox').innerHTML = !list.length ? '<div class="empty"><i class="fas fa-box-open"></i>কোনো সার্ভিস নেই</div>' :
+    '<table><thead><tr><th>Service</th><th>Price</th><th>Min–Max</th><th>Refill / Tags</th><th>In Stock</th><th>Visible</th><th></th></tr></thead><tbody>' +
+    list.map(s => '<tr><td><div class="cell-main">' + esc(s.name) + '</div><div class="cell-sub">' + esc(catName(s.cat)) + ' • ' + esc(s.speed) + (s.badge ? ' • ' + esc(s.badge) : '') + '</div></td>' +
+      '<td><b>' + money(s.rate) + '</b><div class="cell-sub">' + (s.type === 'fixed' ? 'fixed' : 'per 1000') + '</div></td>' +
+      '<td>' + (s.type === 'fixed' ? '—' : Number(s.min).toLocaleString() + ' – ' + Number(s.max).toLocaleString()) + '</td>' +
+      '<td>' + refillChip(s.refill) + (s.tags || []).map(t => '<span class="chip pl">' + esc(t) + '</span>').join('') + '</td>' +
+      '<td><label class="sw"><input type="checkbox" ' + (s.stock !== false ? 'checked' : '') + ' onchange="togSvc(\'' + esc(s.id) + '\',\'stock\',this.checked)"><span></span></label></td>' +
+      '<td><label class="sw"><input type="checkbox" ' + (!s.hidden ? 'checked' : '') + ' onchange="togSvc(\'' + esc(s.id) + '\',\'hidden\',!this.checked)"><span></span></label></td>' +
+      '<td><div class="acts"><button class="btn btn-g btn-sm" onclick="editService(\'' + esc(s.id) + '\')"><i class="fas fa-pen"></i></button><button class="btn btn-no btn-sm" onclick="delSvc(\'' + esc(s.id) + '\')"><i class="fas fa-trash"></i></button></div></td></tr>').join('') + '</tbody></table>';
+}
+async function togSvc(id, field, value) {
+  try { await api('/admin/service/' + encodeURIComponent(id) + '/toggle', 'POST', { field, value }); const s = CAT.services.find(x => x.id === id); if (s) s[field] = value; toast('আপডেট হয়েছে'); }
+  catch (e) { toast(e.message, 'error'); renderSvcs(); }
+}
+async function delSvc(id) { if (!confirm('সার্ভিসটি ডিলেট করবেন? (আগের অর্ডার ঠিক থাকবে)')) return; try { await api('/admin/service/' + encodeURIComponent(id), 'DELETE'); toast('ডিলেট হয়েছে'); pServices(); } catch (e) { toast(e.message, 'error'); } }
+function editService(id) {
+  const s = CAT.services.find(x => x.id === id) || { id: '', cat: CAT.categories[0] && CAT.categories[0].id, name: '', desc: '', type: 'per1000', rate: 0, min: 100, max: 10000, speed: 'Instant', refill: 'none', badge: '', icon: 'fas fa-star', tags: [], stock: true, hidden: false, order: CAT.services.length + 1 };
+  if (!CAT.categories.length) return toast('আগে একটি ক্যাটাগরি বানান', 'error');
+  openModal(mHead(id ? 'সার্ভিস এডিট' : 'নতুন সার্ভিস') + '<div class="mb">' +
+    '<div class="f"><label>সার্ভিসের নাম</label><input class="fi" id="fName" value="' + esc(s.name) + '"><small>প্রথম অংশ বড় হেডিং; ‘ | ’ দিয়ে ভাগ করলে বাকিগুলো ছোট ট্যাগ হবে। যেমন: Instagram Followers | Real | Max 100k | Instant</small></div>' +
+    '<div class="grid2"><div class="f"><label>ক্যাটাগরি</label><select class="fs" id="fCat">' + CAT.categories.map(c => '<option value="' + esc(c.id) + '" ' + (c.id === s.cat ? 'selected' : '') + '>' + esc(c.name) + '</option>').join('') + '</select></div>' +
+    '<div class="f"><label>দামের ধরন</label><select class="fs" id="fType" onchange="typeChg()"><option value="per1000" ' + (s.type !== 'fixed' ? 'selected' : '') + '>প্রতি 1000 এর রেট</option><option value="fixed" ' + (s.type === 'fixed' ? 'selected' : '') + '>ফিক্সড প্যাকেজ (একবারের দাম)</option></select></div></div>' +
+    '<div class="grid3"><div class="f"><label>Rate (৳)</label><input class="fi" type="number" step="0.01" min="0" id="fRate" value="' + s.rate + '"></div>' +
+    '<div class="f mm"><label>Min</label><input class="fi" type="number" min="1" id="fMin" value="' + s.min + '"></div><div class="f mm"><label>Max</label><input class="fi" type="number" min="1" id="fMax" value="' + s.max + '"></div></div>' +
+    '<div class="grid2"><div class="f"><label>Refill Badge</label><select class="fs" id="fRefill">' + REFILLS.map(r => '<option value="' + r[0] + '" ' + (String(s.refill) === r[0] ? 'selected' : '') + '>' + r[1] + '</option>').join('') + '</select></div>' +
+    '<div class="f"><label>Start Time</label><input class="fi" id="fSpeed" value="' + esc(s.speed) + '" placeholder="Instant / 1-3 Hours"></div></div>' +
+    '<div class="f"><label>অতিরিক্ত ট্যাগ (কমা দিয়ে)</label><input class="fi" id="fTags" value="' + esc((s.tags || []).join(', ')) + '" placeholder="High Quality, Real Look"></div>' +
+    '<div class="f"><label>সাব-ক্যাটাগরি (New Order এর Category ড্রপডাউনে দেখাবে)</label><input class="fi" id="fSub" value="' + esc(s.sub || '') + '" placeholder="Followers / Likes / Views / Comments"><small>ফাঁকা রাখলে সার্ভিসের নাম দেখে অটো ধরবে</small></div>' +
+    '<div class="f"><label>বিস্তারিত বর্ণনা (Details বাটনে দেখাবে)</label><textarea class="ft" id="fDesc" placeholder="সার্ভিসের নিয়ম, কোয়ালিটি, কীভাবে কাজ করে...">' + esc(s.desc) + '</textarea></div>' +
+    '<div class="grid3"><div class="f"><label>কার্ড ব্যাজ</label><select class="fs" id="fBadge">' + ['', 'starter', 'popular', 'pro', 'vip'].map(b => '<option value="' + b + '" ' + (s.badge === b ? 'selected' : '') + '>' + (b || 'নেই') + '</option>').join('') + '</select></div>' +
+    '<div class="f"><label>আইকন (FontAwesome)</label><input class="fi" id="fIcon" value="' + esc(s.icon) + '"></div><div class="f"><label>ক্রম (Order)</label><input class="fi" type="number" id="fOrder" value="' + esc(s.order) + '"></div></div>' +
+    '<label class="chk"><input type="checkbox" id="fStock" ' + (s.stock !== false ? 'checked' : '') + '> In Stock</label><label class="chk"><input type="checkbox" id="fHidden" ' + (s.hidden ? 'checked' : '') + '> সাইট থেকে লুকান</label>' +
+    '</div><div class="mf"><button class="btn btn-g" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="saveService(\'' + esc(id || '') + '\')"><i class="fas fa-floppy-disk"></i> Save</button></div>');
+  typeChg();
+}
+function typeChg() { document.querySelectorAll('.mm').forEach(e => e.classList.toggle('hide', $('fType').value === 'fixed')); }
+async function saveService(id) {
+  try {
+    await api('/admin/service', 'POST', { id, name: $('fName').value, cat: $('fCat').value, type: $('fType').value, rate: $('fRate').value, min: $('fMin').value, max: $('fMax').value, refill: $('fRefill').value, speed: $('fSpeed').value, tags: $('fTags').value, sub: $('fSub').value, desc: $('fDesc').value, badge: $('fBadge').value, icon: $('fIcon').value, order: $('fOrder').value, stock: $('fStock').checked, hidden: $('fHidden').checked });
+    closeModal(); toast('সার্ভিস সেভ হয়েছে'); pServices();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ==========================================================================
+   CATEGORIES
+   ========================================================================== */
+async function pCategories() {
+  await loadCat();
+  $('view').innerHTML = '<div class="tools"><button class="btn btn-p" onclick="editCat()"><i class="fas fa-plus"></i> নতুন ক্যাটাগরি</button></div><div class="card"><div class="tbl-wrap">' +
+    (!CAT.categories.length ? '<div class="empty"><i class="fas fa-layer-group"></i>কোনো ক্যাটাগরি নেই</div>' :
+    '<table><thead><tr><th>Category</th><th>ID</th><th>Services</th><th>Order</th><th>Status</th><th></th></tr></thead><tbody>' +
+    CAT.categories.map(c => '<tr><td><div class="cell-main"><i class="' + esc(c.icon) + '" style="color:' + esc(c.color) + ';margin-right:8px"></i>' + esc(c.name) + '</div></td><td>' + esc(c.id) + '</td><td>' + CAT.services.filter(s => s.cat === c.id).length + '</td><td>' + esc(c.order) + '</td>' +
+      '<td>' + (c.hidden ? '<span class="pill banned">Hidden</span>' : '<span class="pill approved">Visible</span>') + '</td>' +
+      '<td><div class="acts"><button class="btn btn-g btn-sm" onclick="editCat(\'' + esc(c.id) + '\')"><i class="fas fa-pen"></i></button><button class="btn btn-no btn-sm" onclick="delCat(\'' + esc(c.id) + '\')"><i class="fas fa-trash"></i></button></div></td></tr>').join('') + '</tbody></table>') + '</div></div>';
+}
+function editCat(id) {
+  const c = CAT.categories.find(x => x.id === id) || { id: '', name: '', icon: 'fas fa-globe', color: '#FF6B00', linkPh: 'https://', linkHint: '', rules: [], hidden: false, order: CAT.categories.length + 1 };
+  openModal(mHead(id ? 'ক্যাটাগরি এডিট' : 'নতুন ক্যাটাগরি') + '<div class="mb">' +
+    '<div class="grid2"><div class="f"><label>নাম</label><input class="fi" id="cName" value="' + esc(c.name) + '"></div><div class="f"><label>ID (ইংরেজি, একবার দিলে বদলানো যাবে না)</label><input class="fi" id="cId" value="' + esc(c.id) + '" ' + (id ? 'disabled' : '') + ' placeholder="youtube"></div></div>' +
+    '<div class="grid3"><div class="f"><label>আইকন</label><input class="fi" id="cIcon" value="' + esc(c.icon) + '" placeholder="fab fa-youtube"></div><div class="f"><label>রঙ</label><input class="fi" type="color" id="cColor" value="' + esc(c.color) + '" style="padding:4px;height:44px"></div><div class="f"><label>ক্রম</label><input class="fi" type="number" id="cOrder" value="' + esc(c.order) + '"></div></div>' +
+    '<div class="f"><label>লিংক Placeholder</label><input class="fi" id="cPh" value="' + esc(c.linkPh) + '"></div>' +
+    '<div class="f"><label>লিংক Hint (অর্ডার পেজে দেখাবে)</label><input class="fi" id="cHint" value="' + esc(c.linkHint) + '"></div>' +
+    '<div class="f"><label>Rules (প্রতি লাইনে একটি)</label><textarea class="ft" id="cRules">' + esc((c.rules || []).join('\n')) + '</textarea></div>' +
+    '<label class="chk"><input type="checkbox" id="cHidden" ' + (c.hidden ? 'checked' : '') + '> সাইট থেকে লুকান</label></div>' +
+    '<div class="mf"><button class="btn btn-g" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="saveCat(\'' + esc(id || '') + '\')"><i class="fas fa-floppy-disk"></i> Save</button></div>');
+}
+async function saveCat(id) {
+  try { await api('/admin/category', 'POST', { id: id || $('cId').value, name: $('cName').value, icon: $('cIcon').value, color: $('cColor').value, order: $('cOrder').value, linkPh: $('cPh').value, linkHint: $('cHint').value, rules: $('cRules').value, hidden: $('cHidden').checked }); closeModal(); toast('ক্যাটাগরি সেভ হয়েছে'); pCategories(); }
+  catch (e) { toast(e.message, 'error'); }
+}
+async function delCat(id) { if (!confirm('ক্যাটাগরি ডিলেট করবেন?')) return; try { await api('/admin/category/' + encodeURIComponent(id), 'DELETE'); toast('ডিলেট হয়েছে'); pCategories(); } catch (e) { toast(e.message, 'error'); } }
+
+/* ==========================================================================
+   USERS
+   ========================================================================== */
+let userList = [];
+async function pUsers() {
+  $('view').innerHTML = '<div class="tools"><input id="uq" placeholder="নাম / ইমেইল সার্চ..." onkeydown="if(event.key===\'Enter\')loadUsers()"><button class="btn btn-p" onclick="loadUsers()"><i class="fas fa-search"></i> Search</button></div><div class="card"><div class="tbl-wrap" id="usrBox"></div></div>';
+  await loadUsers();
+}
+async function loadUsers() {
+  const r = await api('/admin/users?q=' + encodeURIComponent(($('uq') || {}).value || '')); userList = r.users;
+  $('usrBox').innerHTML = !userList.length ? '<div class="empty"><i class="fas fa-users"></i>কোনো ইউজার নেই</div>' :
+    '<table><thead><tr><th>User</th><th>Balance</th><th>Joined</th><th>Status</th><th></th></tr></thead><tbody>' +
+    userList.map(u => '<tr><td><div class="cell-main">' + esc(u.name) + '</div><div class="cell-sub">' + esc(u.email) + '</div></td><td><b>' + money(u.balance) + '</b></td><td style="white-space:nowrap">' + fmt(u.createdAt) + '</td>' +
+      '<td>' + (u.banned ? '<span class="pill banned">Banned</span>' : '<span class="pill approved">Active</span>') + '</td>' +
+      '<td><div class="acts"><button class="btn btn-g btn-sm" onclick="balModal(\'' + esc(u.uid) + '\')"><i class="fas fa-wallet"></i> Balance</button><button class="btn ' + (u.banned ? 'btn-ok' : 'btn-no') + ' btn-sm" onclick="banUser(\'' + esc(u.uid) + '\',' + !u.banned + ')">' + (u.banned ? 'Unban' : 'Ban') + '</button></div></td></tr>').join('') + '</tbody></table>';
+}
+function balModal(uid) {
+  const u = userList.find(x => x.uid === uid); if (!u) return;
+  openModal(mHead('Balance — ' + esc(u.name)) + '<div class="mb"><div class="kv"><span>Email</span><b>' + esc(u.email) + '</b><span>Balance</span><b>' + money(u.balance) + '</b></div>' +
+    '<div class="grid2"><div class="f"><label>Action</label><select class="fs" id="bType"><option value="add">+ Add</option><option value="deduct">− Deduct</option></select></div><div class="f"><label>Amount (৳)</label><input class="fi" type="number" min="0" step="0.01" id="bAmt"></div></div>' +
+    '<div class="f"><label>নোট</label><input class="fi" id="bNote" maxlength="100" placeholder="Admin credit"></div></div>' +
+    '<div class="mf"><button class="btn btn-g" onclick="closeModal()">Cancel</button><button class="btn btn-p" onclick="doBal(\'' + esc(uid) + '\')"><i class="fas fa-check"></i> Confirm</button></div>');
+}
+async function doBal(uid) { try { await api('/admin/user/' + encodeURIComponent(uid) + '/balance', 'POST', { type: $('bType').value, amount: $('bAmt').value, note: $('bNote').value }); closeModal(); toast('ব্যালেন্স আপডেট হয়েছে'); loadUsers(); } catch (e) { toast(e.message, 'error'); } }
+async function banUser(uid, banned) { if (!confirm(banned ? 'ইউজারকে ব্লক করবেন?' : 'ইউজারকে আনব্লক করবেন?')) return; try { await api('/admin/user/' + encodeURIComponent(uid) + '/ban', 'POST', { banned }); toast('আপডেট হয়েছে'); loadUsers(); } catch (e) { toast(e.message, 'error'); } }
+
+/* ==========================================================================
+   SETTINGS
+   ========================================================================== */
+async function pSettings() {
+  SET = (await api('/admin/settings')).settings; const s = SET, p = s.payments || {}, g = s.pages || {};
+  const fld = (id, l, v, ph, extra) => '<div class="f"><label>' + l + '</label><input class="fi" id="' + id + '" value="' + esc(v) + '" placeholder="' + esc(ph || '') + '" ' + (extra || '') + '></div>';
+  $('view').innerHTML = '<div class="card"><div class="card-b">' +
+    '<div class="set-sec">সাধারণ</div>' + '<div class="grid2">' + fld('sBrandIn', 'ব্র্যান্ডের নাম', s.brand) + fld('sMin', 'সর্বনিম্ন ডিপোজিট (৳)', s.minDeposit, '', 'type="number"') + '</div>' +
+    fld('sNotice', 'নোটিশ (হোমে স্ক্রল করবে, ফাঁকা = লুকানো)', s.notice) +
+    '<label class="chk"><input type="checkbox" id="sMaint" ' + (s.maintenance ? 'checked' : '') + '> <span><b>Maintenance Mode</b> — চালু করলে সাইটে অর্ডার বন্ধ ও মেইনটেনেন্স স্ক্রিন দেখাবে</span></label>' +
+    '<div class="set-sec">সাপোর্ট লিংক (ফাঁকা থাকলে বাটন লুকাবে)</div><div class="grid2">' + fld('sWa', 'WhatsApp নম্বর (দেশ কোড সহ, + ছাড়া)', s.whatsapp, '8801XXXXXXXXX') + fld('sTg', 'Telegram Username', s.telegram, 'username') + fld('sGroup', 'Group লিংক', s.group, 'https://t.me/...') + fld('sYt', 'YouTube লিংক', s.youtube) + '</div>' + fld('sMail', 'Email', s.email) +
+    '<div class="set-sec">Add Fund পেজ</div>' + fld('sPayNote', 'Add Fund পেজের উপরের নির্দেশনা (পেমেন্ট মেথড Gateways থেকে ম্যানেজ করুন)', s.payNote) +
+    '<div class="set-sec">টিকেট Quick Reply (প্রতি লাইনে একটি)</div><div class="f"><textarea class="ft" id="sQuick" rows="4">' + esc((s.quickReplies || []).join('\n')) + '</textarea></div>' +
+    '<div class="set-sec">হোম স্লাইডার</div><div class="f"><textarea class="ft" id="sCovers" rows="5">' + esc((s.covers || []).map(c => [String(c.title).replace(/<br>/g, '\\n'), c.sub, c.src].join(' | ')).join('\n')) + '</textarea><small>প্রতি লাইনে একটি স্লাইড: <b>শিরোনাম | সাবটাইটেল | ছবির লিংক (ঐচ্ছিক)</b> — শিরোনামে লাইন ভাঙতে \\n লিখুন</small></div>' +
+    '<div class="set-sec">পেজ কনটেন্ট (ফুটারের লিংক)</div>' +
+    [['pAbout', 'About Us', g.about], ['pTerms', 'Terms & Conditions', g.terms], ['pPriv', 'Privacy Policy', g.privacy], ['pRef', 'Refund Policy', g.refund]].map(x => '<div class="f"><label>' + x[1] + '</label><textarea class="ft" id="' + x[0] + '">' + esc(x[2]) + '</textarea></div>').join('') +
+    '<button class="btn btn-p btn-big" onclick="saveSettings()"><i class="fas fa-floppy-disk"></i> Save Settings</button></div></div>';
+}
+async function saveSettings() {
+  const covers = $('sCovers').value.split('\n').map(l => l.trim()).filter(Boolean).map(l => { const a = l.split('|').map(x => x.trim()); return { title: (a[0] || '').replace(/\\n/g, '<br>'), sub: a[1] || '', src: a[2] || '', icon: 'fas fa-rocket' }; });
+  try {
+    const r = await api('/admin/settings', 'POST', { brand: $('sBrandIn').value, minDeposit: $('sMin').value, notice: $('sNotice').value, maintenance: $('sMaint').checked, whatsapp: $('sWa').value, telegram: $('sTg').value, group: $('sGroup').value, youtube: $('sYt').value, email: $('sMail').value,
+      payNote: $('sPayNote').value, quickReplies: $('sQuick').value.split('\n').map(x => x.trim()).filter(Boolean), covers, pages: { about: $('pAbout').value, terms: $('pTerms').value, privacy: $('pPriv').value, refund: $('pRef').value } });
+    SET = r.settings; $('sBrand').textContent = SET.brand; toast('সেটিংস সেভ হয়েছে');
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+/* ---------- init ---------- */
+if (TOKEN) start();
+</script>
+</body>
+</html>
