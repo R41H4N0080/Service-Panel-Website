@@ -21,13 +21,14 @@ const admin = require('firebase-admin');
    এটা পাবলিক তথ্য; /api/config দিয়ে ফ্রন্টএন্ডে যায়, তাই backend ছাড়া সাইট চলবে না।
    ========================================================================== */
 const FIREBASE_WEB_CONFIG = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
-  databaseURL: 'https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_PROJECT_ID.appspot.com',
-  messagingSenderId: 'YOUR_SENDER_ID',
-  appId: 'YOUR_APP_ID'
+ apiKey: "AIzaSyCxFw8-qUbJ5i7BWwh46GL7Tf5JCl3M_cU",
+  authDomain: "social-service-panel.firebaseapp.com",
+  databaseURL: "https://social-service-panel-default-rtdb.firebaseio.com",
+  projectId: "social-service-panel",
+  storageBucket: "social-service-panel.firebasestorage.app",
+  messagingSenderId: "1011326650302",
+  appId: "1:1011326650302:web:451dd843a6ac7e3b251bef",
+  measurementId: "G-L9029CR6SN"
 };
 
 /* ==========================================================================
