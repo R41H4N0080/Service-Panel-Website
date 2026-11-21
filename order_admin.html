@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Order Tracker Admin</title>
+<link rel="icon" href="/img/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{--primary:#FF6B00;--primary-light:#FF8A00;--primary-dark:#E65C00;--glow:0 8px 25px rgba(255,107,0,.4);--bg:#F8F9FA;--text:#1F2937;--muted:#6B7280;--light:#9CA3AF;--border:#E5E7EB;--tint:#FFF7ED;--tint2:#FFEDD5;
+--success:#10B981;--danger:#EF4444;--warning:#F59E0B;--info:#3B82F6;--sh:0 2px 8px rgba(0,0,0,.04);--r:14px;--rl:20px;--side:250px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'Poppins','Hind Siliguri',sans-serif;font-size:14px}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+.hide{display:none!important}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(circle at 20% 0,#FFE2CC,transparent 45%),var(--bg)}
+.login-card{width:100%;max-width:380px;background:#fff;border-radius:24px;padding:38px 26px 28px;text-align:center;border:1px solid var(--tint2);box-shadow:0 20px 40px rgba(255,107,0,.1)}
+.login-logo{width:70px;height:70px;border-radius:20px;border:2px solid var(--primary-light);margin:0 auto 14px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary);font-size:30px}
+.login-logo img{width:100%;height:100%;object-fit:cover}
+.login-card h1{font-size:21px;font-weight:900}.login-card h1 span{color:var(--primary)}
+.login-card p{color:var(--muted);font-size:13px;margin:6px 0 20px}
+.pw{position:relative}.pw i{position:absolute;right:18px;top:17px;color:var(--light);cursor:pointer}
+.login-card input{width:100%;padding:15px 46px 15px 18px;border:2px solid var(--border);border-radius:50px;font-weight:600;background:#F8F9FA;outline:0;text-align:center;margin-bottom:12px}
+.login-card input:focus{border-color:var(--primary);background:#fff}
+.err{color:var(--danger);font-size:12.5px;font-weight:700;margin:-2px 0 10px}
+.btn{border:0;cursor:pointer;border-radius:50px;padding:11px 20px;font-weight:700;font-size:13.5px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.2s;text-decoration:none}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn-p{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 4px 14px rgba(255,107,0,.3)}
+.btn-p:hover{transform:translateY(-1px)}
+.btn-g{background:#fff;color:var(--text);border:2px solid var(--border)}.btn-g:hover{border-color:var(--primary);color:var(--primary)}
+.btn-d{background:#FEE2E2;color:var(--danger)}.btn-s{background:#D1FAE5;color:#047857}.btn-wa{background:#22C55E;color:#fff}
+.btn-sm{padding:7px 13px;font-size:12.5px}.btn-ic{width:34px;height:34px;padding:0;border-radius:10px}
+.login-card .btn{width:100%;padding:14px}
+/* layout */
+.app{display:flex;min-height:100vh}
+.side{width:var(--side);background:#fff;border-right:1px solid var(--border);position:fixed;top:0;bottom:0;left:0;z-index:50;display:flex;flex-direction:column;transition:transform .3s;overflow-y:auto}
+.side-head{display:flex;gap:11px;align-items:center;padding:18px 16px;border-bottom:1px solid var(--border)}
+.side-logo{width:42px;height:42px;border-radius:12px;border:1.5px solid var(--primary-light);overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--tint);color:var(--primary)}
+.side-logo img{width:100%;height:100%;object-fit:cover}
+.side-head b{font-size:15px;font-weight:800;color:var(--primary-dark);display:block;line-height:1.1}.side-head small{font-size:10.5px;color:var(--muted);font-weight:700}
+.nav{padding:14px 10px;flex:1}
+.nav a{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:13px;color:var(--text);font-weight:700;font-size:13.5px;cursor:pointer;margin-bottom:4px;text-decoration:none;transition:.15s}
+.nav a i{width:20px;text-align:center;color:var(--primary)}
+.nav a:hover{background:var(--tint)}
+.nav a.active{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:var(--glow)}.nav a.active i{color:#fff}
+.nav .sep{font-size:10.5px;font-weight:800;color:var(--light);text-transform:uppercase;letter-spacing:.6px;padding:14px 14px 6px}
+.nav .dot{margin-left:auto;background:var(--danger);color:#fff;border-radius:20px;font-size:11px;padding:2px 8px;font-weight:800}
+.main{margin-left:var(--side);flex:1;min-width:0}
+.topbar{display:none;position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--border);padding:11px 14px;align-items:center;gap:12px}
+.page{padding:24px;max-width:1280px}
+.ph{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.ph h2{font-size:21px;font-weight:900}.ph small{color:var(--muted);display:block;font-weight:600;font-size:12.5px}.ph .sp{flex:1}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:18px;box-shadow:var(--sh);display:flex;gap:14px;align-items:center}
+.stat .si{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}
+.stat small{color:var(--muted);font-weight:700;font-size:11.5px;display:block}.stat b{font-size:21px;font-weight:900}
+.i-o{background:var(--tint2);color:var(--primary)}.i-g{background:#D1FAE5;color:#059669}.i-b{background:#DBEAFE;color:#2563EB}.i-a{background:#FEF3C7;color:#D97706}.i-r{background:#FEE2E2;color:#DC2626}.i-p{background:#EDE9FE;color:#7C3AED}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--sh);margin-bottom:20px;overflow:hidden}
+.card-h{padding:16px 18px;border-bottom:1px solid var(--border);font-weight:800;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.card-h i{color:var(--primary)}
+.card-b{padding:18px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--border);align-items:center}
+.tools input,.tools select,.fi,.fs,.ft{padding:10px 14px;border:2px solid var(--border);border-radius:12px;font-weight:600;background:#F8F9FA;outline:0;transition:.2s;width:100%}
+.tools input,.tools select{width:auto;min-width:150px}.tools input.grow{flex:1;min-width:200px}
+.tools input:focus,.tools select:focus,.fi:focus,.fs:focus,.ft:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px rgba(255,107,0,.1)}
+.ft{min-height:80px;resize:vertical}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:12px 14px;background:#F9FAFB;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid #F3F4F6;vertical-align:middle;font-size:13px}
+tr:last-child td{border-bottom:0}tbody tr:hover{background:#FFFAF5}
+.cm{font-weight:800;line-height:1.35;max-width:300px;word-break:break-word}.cs{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px;word-break:break-all}
+.av{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primary),#FFA05A);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;font-size:13px}
+.flex{display:flex;gap:11px;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;font-size:11.5px;font-weight:800;white-space:nowrap}
+.s-Completed{background:#D1FAE5;color:#047857}.s-Pending{background:#FEF3C7;color:#B45309}.s-InProgress{background:#DBEAFE;color:#1D4ED8}.s-Partial{background:#EDE9FE;color:#6D28D9}.s-Cancelled{background:#FEE2E2;color:#B91C1C}
+.sst{border:0;border-radius:99px;font-weight:800;font-size:11.5px;padding:5px 8px;cursor:pointer;outline:0}
+.lk{display:flex;align-items:center;gap:6px;background:var(--tint);border:1px dashed #FDBA74;border-radius:10px;padding:5px 8px;max-width:230px;font-size:11.5px;font-weight:700;color:var(--primary-dark)}
+.lk span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;direction:ltr}
+.acts{display:flex;gap:6px}
+.empty{padding:46px 20px;text-align:center;color:var(--muted);font-weight:600}.empty i{display:block;font-size:34px;color:#FFD2B0;margin-bottom:8px}
+.bulk{display:flex;gap:10px;align-items:center;background:var(--tint);padding:10px 16px;border-bottom:1px solid var(--tint2);flex-wrap:wrap;font-weight:700}
+.fg{margin-bottom:14px}.fg label{display:block;font-weight:700;font-size:12.5px;margin-bottom:6px}.fg small{color:var(--muted);font-size:11.5px;display:block;margin-top:4px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.ov{position:fixed;inset:0;background:rgba(17,24,39,.5);z-index:100;display:flex;align-items:center;justify-content:center;padding:14px}
+.md{background:#fff;border-radius:22px;width:100%;max-width:560px;max-height:93vh;overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.md-h{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px;position:sticky;top:0;background:#fff;z-index:2}
+.md-h .x{margin-left:auto;border:0;background:#F3F4F6;width:34px;height:34px;border-radius:50%;cursor:pointer}
+.md-b{padding:20px 22px}.md-f{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:#fff}
+.toasts{position:fixed;top:16px;right:16px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{background:#111827;color:#fff;padding:12px 16px;border-radius:14px;font-weight:700;font-size:13px;display:flex;gap:9px;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.2);animation:ti .25s}
+.toast.error{background:#B91C1C}.toast i{color:#34D399}.toast.error i{color:#fff}
+@keyframes ti{from{transform:translateX(30px);opacity:0}}
+.linkbox{display:flex;gap:8px;align-items:center;background:var(--tint);border:1px dashed #FDBA74;border-radius:14px;padding:10px 12px;font-weight:700;color:var(--primary-dark);word-break:break-all;font-size:12.5px}
+.chk{width:17px;height:17px;accent-color:var(--primary);cursor:pointer}
+@media(max-width:900px){.side{transform:translateX(-100%)}.side.open{transform:none;box-shadow:0 0 0 100vw rgba(0,0,0,.4)}.main{margin-left:0}.topbar{display:flex}.page{padding:16px}.row3{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.row2,.row3{grid-template-columns:1fr}.ph h2{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="login-wrap" id="loginWrap">
+  <form class="login-card" onsubmit="doLogin(event)">
+    <div class="login-logo"><img src="/img/logo.png" alt="" onerror="this.remove()"><i class="fa-solid fa-truck-fast" style="position:absolute;z-index:-1"></i></div>
+    <h1>Order <span>Tracker</span> Admin</h1>
+    <p>মূল অ্যাডমিন প্যানেলের পাসওয়ার্ড দিয়ে লগইন করুন</p>
+    <div class="pw"><input type="password" id="pw" placeholder="পাসওয়ার্ড" autocomplete="current-password" required><i class="fa-regular fa-eye" onclick="const p=$('pw');p.type=p.type==='password'?'text':'password'"></i></div>
+    <div class="err" id="loginErr"></div>
+    <button class="btn btn-p" id="loginBtn" type="submit"><i class="fa-solid fa-right-to-bracket"></i> লগইন</button>
+  </form>
+</div>
+
+<div class="app hide" id="app">
+  <aside class="side" id="side">
+    <div class="side-head"><div class="side-logo"><img src="/img/logo.png" alt="" onerror="this.remove()"></div><div><b id="sName">Order Tracker</b><small>ADMIN PANEL</small></div></div>
+    <nav class="nav">
+      <a data-p="dashboard" class="active" onclick="go('dashboard')"><i class="fa-solid fa-gauge-high"></i> ড্যাশবোর্ড</a>
+      <a data-p="customers" onclick="go('customers')"><i class="fa-solid fa-users"></i> কাস্টমার <span class="dot" id="nbC" style="background:var(--primary)">0</span></a>
+      <a data-p="orders" onclick="go('orders')"><i class="fa-solid fa-box-open"></i> অর্ডার <span class="dot" id="nbO">0</span></a>
+      <a data-p="settings" onclick="go('settings')"><i class="fa-solid fa-gear"></i> সেটিংস</a>
+      <div class="sep">লিংক</div>
+      <a href="/admin" target="_blank"><i class="fa-solid fa-shield-halved"></i> মূল অ্যাডমিন</a>
+      <a href="/" target="_blank"><i class="fa-solid fa-store"></i> মূল সাইট</a>
+      <a onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> লগআউট</a>
+    </nav>
+  </aside>
+  <div class="main">
+    <div class="topbar"><button class="btn btn-g btn-ic" onclick="$('side').classList.toggle('open')"><i class="fa-solid fa-bars"></i></button><b style="color:var(--primary-dark)" id="tName">Order Tracker</b></div>
+    <div class="page" id="page"></div>
+  </div>
+</div>
+<div id="modalRoot"></div><div class="toasts" id="toasts"></div>
+
+<script>
+const API='/api',$=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>'৳'+Number(n||0).toLocaleString('en-US',{maximumFractionDigits:2});
+const ST=['Pending','In Progress','Completed','Partial','Cancelled'];
+const SL={Pending:'পেন্ডিং','In Progress':'চলমান',Completed:'সম্পন্ন',Partial:'আংশিক',Cancelled:'বাতিল'};
+const sk=s=>String(s).replace(/\s/g,'');
+let TOKEN='';try{TOKEN=sessionStorage.getItem('adm_tk')||''}catch(e){}
+let D={customers:[],orders:[],settings:{}},cur='dashboard';
+let F={cq:'',oq:'',os:'all',oc:'all'},SEL=new Set();
+
+function toast(m,t){const e=document.createElement('div');e.className='toast '+(t||'');e.innerHTML='<i class="fa-solid '+(t==='error'?'fa-circle-xmark':'fa-circle-check')+'"></i><span>'+esc(m)+'</span>';$('toasts').appendChild(e);setTimeout(()=>e.remove(),3200)}
+async function api(path,method,body){
+  let res;const ac=new AbortController(),t=setTimeout(()=>ac.abort(),25000);
+  try{res=await fetch(API+path,{method:method||'GET',signal:ac.signal,headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:body?JSON.stringify(body):undefined})}
+  catch(e){throw new Error('সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না')}finally{clearTimeout(t)}
+  let d=null;try{d=await res.json()}catch(e){}
+  if(res.status===401&&path!=='/admin/login'){logout(true);throw new Error((d&&d.error)||'সেশন শেষ, আবার লগইন করুন')}
+  if(!res.ok)throw new Error((d&&d.error)||'সমস্যা ('+res.status+')');
+  return d;
+}
+async function doLogin(ev){
+  ev.preventDefault();$('loginErr').textContent='';$('loginBtn').disabled=true;
+  try{const r=await api('/admin/login','POST',{password:$('pw').value});TOKEN=r.token;try{sessionStorage.setItem('adm_tk',TOKEN)}catch(e){}start()}
+  catch(e){$('loginErr').textContent=e.message}finally{$('loginBtn').disabled=false}
+}
+function logout(silent){TOKEN='';try{sessionStorage.removeItem('adm_tk')}catch(e){}$('app').classList.add('hide');$('loginWrap').classList.remove('hide');$('pw').value='';if(!silent)toast('লগআউট হয়েছে')}
+async function start(){
+  try{await reload()}catch(e){return}
+  $('loginWrap').classList.add('hide');$('app').classList.remove('hide');go(cur);
+}
+async function reload(){D=await api('/admin/track/all');D.customers.sort((a,b)=>b.createdAt-a.createdAt);D.orders.sort((a,b)=>b.createdAt-a.createdAt);
+  const n=D.settings.siteName||'Order Tracker';$('sName').textContent=n;$('tName').textContent=n;
+  $('nbC').textContent=D.customers.length;const p=D.orders.filter(o=>o.status==='Pending').length;$('nbO').textContent=p;$('nbO').style.display=p?'':'none'}
+function go(p){cur=p;SEL.clear();document.querySelectorAll('.nav a[data-p]').forEach(a=>a.classList.toggle('active',a.dataset.p===p));$('side').classList.remove('open');
+  $('page').innerHTML='';({dashboard:pDash,customers:pCust,orders:pOrd,settings:pSet})[p]();window.scrollTo(0,0)}
+const refresh=async()=>{await reload();go(cur)};
+
+/* ---------- helpers ---------- */
+const byId=id=>D.customers.find(c=>c.id===id);
+const cOrders=id=>D.orders.filter(o=>o.customerId===id);
+const spent=id=>Math.round(cOrders(id).filter(o=>o.status!=='Cancelled').reduce((s,o)=>s+(+o.charge||0),0)*100)/100;
+const badge=s=>'<span class="badge s-'+sk(s)+'">'+esc(SL[s]||s)+'</span>';
+const link=c=>{const b=(D.settings.baseUrl||location.origin+'/track').replace(/\/+$/,'');return b+'?key='+c.publicKey};
+function cp(t){(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast('কপি হয়েছে')).catch(()=>{const i=document.createElement('input');i.value=t;document.body.appendChild(i);i.select();try{document.execCommand('copy');toast('কপি হয়েছে')}catch(e){}i.remove()})}
+const cpL=id=>cp(link(byId(id)));
+function waShare(id){const c=byId(id);const msg='আসসালামু আলাইকুম '+c.name+', আপনার অর্ডার ট্র্যাক করুন: '+link(c);window.open('https://wa.me/'+String(c.phone||'').replace(/[^0-9]/g,'')+'?text='+encodeURIComponent(msg),'_blank')}
+function modal(title,body,foot){closeM();const d=document.createElement('div');d.className='ov';d.id='mdl';d.onclick=e=>{if(e.target===d)closeM()};
+  d.innerHTML='<div class="md"><div class="md-h">'+title+'<button class="x" onclick="closeM()"><i class="fa-solid fa-xmark"></i></button></div><div class="md-b">'+body+'</div>'+(foot?'<div class="md-f">'+foot+'</div>':'')+'</div>';$('modalRoot').appendChild(d)}
+function closeM(){const m=$('mdl');if(m)m.remove()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+async function run(btn,fn){if(btn)btn.disabled=true;try{await fn()}catch(e){toast(e.message,'error')}finally{if(btn)btn.disabled=false}}
+const head=(t,s,act)=>'<div class="ph"><div><h2>'+t+'</h2><small>'+s+'</small></div><div class="sp"></div>'+(act||'')+'</div>';
+
+/* ---------- dashboard ---------- */
+function pDash(){
+  const o=D.orders,c=D.customers,n=s=>o.filter(x=>x.status===s).length;
+  const rev=o.filter(x=>x.status!=='Cancelled').reduce((s,x)=>s+(+x.charge||0),0),paid=c.reduce((s,x)=>s+(+x.paid||0),0);
+  const stat=(i,k,v,l)=>'<div class="stat"><div class="si '+k+'"><i class="fa-solid '+i+'"></i></div><div><small>'+l+'</small><b>'+v+'</b></div></div>';
+  const top=c.map(x=>({c:x,s:spent(x.id)})).sort((a,b)=>b.s-a.s).slice(0,5);
+  $('page').innerHTML=head('ড্যাশবোর্ড','অর্ডার ট্র্যাকিং সিস্টেমের সারসংক্ষেপ','<button class="btn btn-p" onclick="custForm()"><i class="fa-solid fa-user-plus"></i> নতুন কাস্টমার</button><button class="btn btn-g" onclick="ordForm()"><i class="fa-solid fa-plus"></i> নতুন অর্ডার</button>')+
+  '<div class="grid">'+stat('fa-users','i-o',c.length,'কাস্টমার')+stat('fa-box-open','i-b',o.length,'মোট অর্ডার')+stat('fa-clock','i-a',n('Pending'),'পেন্ডিং')+stat('fa-spinner','i-p',n('In Progress'),'চলমান')+stat('fa-circle-check','i-g',n('Completed'),'সম্পন্ন')+stat('fa-sack-dollar','i-o',fmt(rev),'মোট বিক্রি')+stat('fa-hand-holding-dollar','i-g',fmt(paid),'পরিশোধ')+stat('fa-triangle-exclamation','i-r',fmt(Math.max(0,rev-paid)),'মোট বাকি')+'</div>'+
+  '<div style="display:grid;grid-template-columns:2fr 1fr;gap:20px" class="dg"><div class="card"><div class="card-h"><i class="fa-solid fa-clock-rotate-left"></i> সাম্প্রতিক অর্ডার<span style="flex:1"></span><button class="btn btn-g btn-sm" onclick="go(\'orders\')">সব দেখুন</button></div>'+
+  (o.length?'<div class="tw"><table><thead><tr><th>অর্ডার</th><th>কাস্টমার</th><th>সার্ভিস</th><th>দাম</th><th>স্ট্যাটাস</th></tr></thead><tbody>'+o.slice(0,8).map(x=>'<tr><td><b>'+esc(x.orderId)+'</b></td><td>'+esc(x.customerName)+'</td><td><div class="cm">'+esc(x.service)+'</div></td><td><b>'+fmt(x.charge)+'</b></td><td>'+badge(x.status)+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty"><i class="fa-regular fa-folder-open"></i>কোনো অর্ডার নেই</div>')+'</div>'+
+  '<div class="card"><div class="card-h"><i class="fa-solid fa-trophy"></i> টপ কাস্টমার</div><div class="card-b" style="display:grid;gap:12px">'+(top.length?top.map(t=>'<div class="flex"><div class="av">'+esc(t.c.avatar)+'</div><div style="flex:1;min-width:0"><div class="cm">'+esc(t.c.name)+'</div><div class="cs">'+cOrders(t.c.id).length+' টি অর্ডার</div></div><b>'+fmt(t.s)+'</b></div>').join(''):'<div class="empty" style="padding:20px">কাস্টমার নেই</div>')+'</div></div></div>'+
+  '<style>@media(max-width:900px){.dg{grid-template-columns:1fr!important}}</style>';
+}
+
+/* ---------- customers ---------- */
+function pCust(){
+  $('page').innerHTML=head('কাস্টমার','প্রতিটি কাস্টমারের জন্য আলাদা পাবলিক ট্র্যাকিং লিংক','<button class="btn btn-p" onclick="custForm()"><i class="fa-solid fa-user-plus"></i> নতুন কাস্টমার</button>')+
+  '<div class="card"><div class="tools"><input class="grow" id="cq" placeholder="নাম, ইমেইল বা ফোন দিয়ে খুঁজুন" value="'+esc(F.cq)+'" oninput="F.cq=this.value;custList()"></div><div class="tw" id="cl"></div></div>';custList();
+}
+function custList(){
+  const q=F.cq.toLowerCase().trim();let a=D.customers.filter(c=>!q||(c.name+' '+c.email+' '+c.phone).toLowerCase().includes(q));
+  $('cl').innerHTML=a.length?'<table><thead><tr><th>কাস্টমার</th><th>অর্ডার</th><th>খরচ</th><th>পরিশোধ</th><th>বাকি</th><th>ট্র্যাকিং লিংক</th><th></th></tr></thead><tbody>'+a.map(c=>{const s=spent(c.id),d=Math.round((s-(+c.paid||0))*100)/100;
+  return '<tr><td><div class="flex"><div class="av">'+esc(c.avatar)+'</div><div><div class="cm">'+esc(c.name)+'</div><div class="cs">'+esc(c.email||c.phone||'—')+'</div></div></div></td><td><b>'+cOrders(c.id).length+'</b></td><td>'+fmt(s)+'</td><td style="color:#059669;font-weight:800">'+fmt(c.paid)+'</td><td style="font-weight:800;color:'+(d>0?'var(--danger)':'#059669')+'">'+(d>0?fmt(d):d<0?'+'+fmt(-d):'✓')+'</td>'+
+  '<td><div class="lk"><i class="fa-solid fa-link"></i><span title="'+esc(link(c))+'">'+esc(link(c))+'</span></div></td>'+
+  '<td><div class="acts"><button class="btn btn-g btn-ic" title="কপি" onclick="cpL(\''+c.id+'\')"><i class="fa-regular fa-copy"></i></button><a class="btn btn-g btn-ic" title="খুলুন" target="_blank" href="'+esc(link(c))+'"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>'+
+  '<button class="btn btn-wa btn-ic" title="WhatsApp" onclick="waShare(\''+c.id+'\')"><i class="fa-brands fa-whatsapp"></i></button><button class="btn btn-g btn-ic" title="নতুন অর্ডার" onclick="ordForm(null,\''+c.id+'\')"><i class="fa-solid fa-plus"></i></button><button class="btn btn-g btn-ic" title="এডিট" onclick="custForm(\''+c.id+'\')"><i class="fa-solid fa-pen"></i></button><button class="btn btn-d btn-ic" title="ডিলিট" onclick="custDel(\''+c.id+'\')"><i class="fa-solid fa-trash"></i></button></div></td></tr>'}).join('')+'</tbody></table>':'<div class="empty"><i class="fa-solid fa-users-slash"></i>কোনো কাস্টমার নেই</div>';
+}
+function custForm(id){
+  const c=id?byId(id):{name:'',avatar:'',email:'',phone:'',joined:new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),paid:0,note:''};
+  modal('<i class="fa-solid fa-user" style="color:var(--primary)"></i> '+(id?'কাস্টমার এডিট':'নতুন কাস্টমার'),
+  '<div class="row2"><div class="fg"><label>নাম *</label><input class="fi" id="cn" value="'+esc(c.name)+'"></div><div class="fg"><label>অবতার (২ অক্ষর)</label><input class="fi" id="ca" maxlength="3" value="'+esc(c.avatar)+'" placeholder="অটো"></div></div>'+
+  '<div class="row2"><div class="fg"><label>ইমেইল</label><input class="fi" id="ce" type="email" value="'+esc(c.email)+'"></div><div class="fg"><label>ফোন / WhatsApp</label><input class="fi" id="cph" value="'+esc(c.phone)+'" placeholder="8801XXXXXXXXX"></div></div>'+
+  '<div class="row2"><div class="fg"><label>যোগদানের তারিখ</label><input class="fi" id="cj" value="'+esc(c.joined)+'"></div><div class="fg"><label>মোট পরিশোধ (৳)</label><input class="fi" id="cpd" type="number" min="0" step="any" value="'+(c.paid||0)+'"></div></div>'+
+  '<div class="fg"><label>অভ্যন্তরীণ নোট (কাস্টমার দেখবে না)</label><textarea class="ft" id="cnt">'+esc(c.note)+'</textarea></div>'+
+  (id?'<div class="fg"><label style="display:flex;gap:8px;align-items:center;font-weight:700"><input type="checkbox" class="chk" id="crg"> নতুন ট্র্যাকিং লিংক তৈরি করুন <small style="margin:0">(পুরনো লিংক বন্ধ হবে)</small></label></div><div class="linkbox"><i class="fa-solid fa-link"></i><span style="flex:1">'+esc(link(c))+'</span><button class="btn btn-g btn-sm" onclick="cpL(\''+id+'\')">কপি</button></div>':''),
+  '<button class="btn btn-g" onclick="closeM()">বাতিল</button><button class="btn btn-p" id="csv" onclick="custSave(\''+(id||'')+'\')"><i class="fa-solid fa-floppy-disk"></i> সেভ</button>');
+}
+function custSave(id){run($('csv'),async()=>{
+  const r=await api('/admin/track/customer','POST',{id,name:$('cn').value,avatar:$('ca').value,email:$('ce').value,phone:$('cph').value,joined:$('cj').value,paid:$('cpd').value,note:$('cnt').value,regen:!!($('crg')&&$('crg').checked)});
+  closeM();toast('সেভ হয়েছে');await refresh();if(!id)modal('<i class="fa-solid fa-circle-check" style="color:var(--success)"></i> কাস্টমার তৈরি হয়েছে','<p style="margin-bottom:12px;font-weight:600">ট্র্যাকিং লিংকটি কাস্টমারকে পাঠান:</p><div class="linkbox"><span style="flex:1">'+esc(link(r.customer))+'</span></div>','<button class="btn btn-g" onclick="cp(\''+esc(link(r.customer))+'\')"><i class="fa-regular fa-copy"></i> কপি</button>'+(r.customer.phone?'<button class="btn btn-wa" onclick="waShare(\''+r.customer.id+'\')"><i class="fa-brands fa-whatsapp"></i> পাঠান</button>':'')+'<button class="btn btn-p" onclick="closeM();ordForm(null,\''+r.customer.id+'\')">অর্ডার যোগ করুন</button>');
+})}
+function custDel(id){const c=byId(id),n=cOrders(id).length;
+  modal('<i class="fa-solid fa-trash" style="color:var(--danger)"></i> ডিলিট নিশ্চিত করুন','<p style="font-weight:600;margin-bottom:12px"><b>'+esc(c.name)+'</b> কে ডিলিট করবেন? তার ট্র্যাকিং লিংক বন্ধ হয়ে যাবে।</p>'+(n?'<label style="display:flex;gap:8px;align-items:center;font-weight:700"><input type="checkbox" class="chk" id="dco" checked> তার '+n+' টি অর্ডারও ডিলিট করুন</label>':''),
+  '<button class="btn btn-g" onclick="closeM()">বাতিল</button><button class="btn btn-d" id="dcb" onclick="custDo(\''+id+'\')">ডিলিট</button>')}
+function custDo(id){run($('dcb'),async()=>{await api('/admin/track/customer/'+id+($('dco')&&$('dco').checked?'?orders=1':''),'DELETE');closeM();toast('ডিলিট হয়েছে');await refresh()})}
+
+/* ---------- orders ---------- */
+function pOrd(){
+  $('page').innerHTML=head('অর্ডার','স্ট্যাটাস বদলালে কাস্টমারের পেজে ২০ সেকেন্ডের মধ্যে আপডেট হবে','<button class="btn btn-g" onclick="csv()"><i class="fa-solid fa-file-csv"></i> CSV</button><button class="btn btn-p" onclick="ordForm()"><i class="fa-solid fa-plus"></i> নতুন অর্ডার</button>')+
+  '<div class="card"><div class="tools"><input class="grow" id="oq" placeholder="অর্ডার আইডি, সার্ভিস, লিংক, কাস্টমার" value="'+esc(F.oq)+'" oninput="F.oq=this.value;ordList()">'+
+  '<select id="os" onchange="F.os=this.value;ordList()"><option value="all">সব স্ট্যাটাস</option>'+ST.map(s=>'<option value="'+s+'"'+(F.os===s?' selected':'')+'>'+SL[s]+'</option>').join('')+'</select>'+
+  '<select id="oc" onchange="F.oc=this.value;ordList()"><option value="all">সব কাস্টমার</option>'+D.customers.map(c=>'<option value="'+c.id+'"'+(F.oc===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select></div><div id="bk"></div><div class="tw" id="ol"></div></div>';ordList();
+}
+function filtered(){const q=F.oq.toLowerCase().trim();return D.orders.filter(o=>(F.os==='all'||o.status===F.os)&&(F.oc==='all'||o.customerId===F.oc)&&(!q||(o.orderId+' '+o.service+' '+o.link+' '+o.customerName).toLowerCase().includes(q)))}
+function ordList(){
+  const a=filtered();
+  $('ol').innerHTML=a.length?'<table><thead><tr><th><input type="checkbox" class="chk" onchange="selAll(this.checked)"></th><th>অর্ডার</th><th>কাস্টমার</th><th>সার্ভিস</th><th>পরিমাণ / বাকি</th><th>দাম</th><th>স্ট্যাটাস</th><th></th></tr></thead><tbody>'+a.map(o=>
+  '<tr><td><input type="checkbox" class="chk" '+(SEL.has(o.id)?'checked':'')+' onchange="selOne(\''+o.id+'\',this.checked)"></td><td><b>'+esc(o.orderId)+'</b><div class="cs">'+esc(o.date||'')+'</div></td><td>'+esc(o.customerName)+'</td>'+
+  '<td><div class="cm">'+esc(o.service)+'</div><div class="cs">'+esc((o.link||'').slice(0,50))+'</div>'+(o.note?'<div class="cs" style="color:var(--primary-dark)"><i class="fa-solid fa-message"></i> '+esc(o.note.slice(0,40))+'</div>':'')+'</td>'+
+  '<td>'+Number(o.quantity).toLocaleString()+'<div class="cs">বাকি '+Number(o.remains).toLocaleString()+'</div></td><td><b>'+fmt(o.charge)+'</b></td>'+
+  '<td><select class="sst s-'+sk(o.status)+'" onchange="setSt(\''+o.id+'\',this)">'+ST.map(s=>'<option value="'+s+'"'+(o.status===s?' selected':'')+'>'+SL[s]+'</option>').join('')+'</select></td>'+
+  '<td><div class="acts"><button class="btn btn-s btn-ic" title="সম্পন্ন" onclick="quick(\''+o.id+'\')"><i class="fa-solid fa-check"></i></button><button class="btn btn-g btn-ic" onclick="ordForm(\''+o.id+'\')"><i class="fa-solid fa-pen"></i></button><button class="btn btn-d btn-ic" onclick="ordDel(\''+o.id+'\')"><i class="fa-solid fa-trash"></i></button></div></td></tr>').join('')+'</tbody></table>':'<div class="empty"><i class="fa-regular fa-folder-open"></i>কোনো অর্ডার নেই</div>';
+  bulkBar();
+}
+function selAll(v){filtered().forEach(o=>v?SEL.add(o.id):SEL.delete(o.id));ordList()}
+function selOne(id,v){v?SEL.add(id):SEL.delete(id);bulkBar()}
+function bulkBar(){const n=SEL.size;$('bk').innerHTML=n?'<div class="bulk"><span>'+n+' টি সিলেক্ট</span><select id="bs" class="sst" style="background:#fff;border:2px solid var(--border);padding:7px 10px">'+ST.map(s=>'<option value="'+s+'">'+SL[s]+'</option>').join('')+'</select><button class="btn btn-p btn-sm" onclick="bulkSt()">স্ট্যাটাস বদলান</button><button class="btn btn-d btn-sm" onclick="bulkDel()"><i class="fa-solid fa-trash"></i> ডিলিট</button><button class="btn btn-g btn-sm" onclick="SEL.clear();ordList()">বাতিল</button></div>':''}
+function bulkSt(){run(null,async()=>{await api('/admin/track/bulk','POST',{ids:[...SEL],status:$('bs').value});toast('আপডেট হয়েছে');SEL.clear();await refresh()})}
+function bulkDel(){if(!confirm(SEL.size+' টি অর্ডার ডিলিট করবেন?'))return;run(null,async()=>{await api('/admin/track/bulk','POST',{ids:[...SEL],action:'delete'});toast('ডিলিট হয়েছে');SEL.clear();await refresh()})}
+function setSt(id,el){const old=D.orders.find(o=>o.id===id).status;el.className='sst s-'+sk(el.value);run(null,async()=>{try{await api('/admin/track/order/'+id+'/status','POST',{status:el.value})}catch(e){el.value=old;el.className='sst s-'+sk(old);throw e}toast('স্ট্যাটাস: '+SL[el.value]);await reload();if(cur==='orders')ordList()})}
+function quick(id){run(null,async()=>{await api('/admin/track/order/'+id+'/status','POST',{status:'Completed'});toast('সম্পন্ন করা হয়েছে');await refresh()})}
+function ordDel(id){if(!confirm('অর্ডারটি ডিলিট করবেন?'))return;run(null,async()=>{await api('/admin/track/order/'+id,'DELETE');toast('ডিলিট হয়েছে');await refresh()})}
+function ordForm(id,cid){
+  if(!D.customers.length){toast('আগে একজন কাস্টমার যোগ করুন','error');return custForm()}
+  const o=id?D.orders.find(x=>x.id===id):{customerId:cid||(F.oc!=='all'?F.oc:''),service:'',link:'',startCount:0,quantity:'',remains:'',charge:'',date:new Date().toISOString().slice(0,10),status:'Pending',note:'',orderId:''};
+  modal('<i class="fa-solid fa-box-open" style="color:var(--primary)"></i> '+(id?'অর্ডার এডিট':'নতুন অর্ডার'),
+  '<div class="fg"><label>কাস্টমার *</label><select class="fs" id="oCu"><option value="">— সিলেক্ট করুন —</option>'+D.customers.map(c=>'<option value="'+c.id+'"'+(o.customerId===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select></div>'+
+  '<div class="fg"><label>সার্ভিসের নাম *</label><input class="fi" id="oSv" value="'+esc(o.service)+'" placeholder="যেমন: Facebook Page Followers"></div>'+
+  '<div class="fg"><label>লিংক</label><input class="fi" id="oLk" value="'+esc(o.link)+'" placeholder="https://"></div>'+
+  '<div class="row3"><div class="fg"><label>পরিমাণ</label><input class="fi" id="oQt" type="number" min="0" value="'+esc(o.quantity)+'"></div><div class="fg"><label>স্টার্ট কাউন্ট</label><input class="fi" id="oSt" type="number" min="0" value="'+esc(o.startCount)+'"></div><div class="fg"><label>বাকি</label><input class="fi" id="oRm" type="number" min="0" value="'+esc(o.remains)+'"></div></div>'+
+  '<div class="row3"><div class="fg"><label>দাম (৳)</label><input class="fi" id="oCh" type="number" min="0" step="any" value="'+esc(o.charge)+'"></div><div class="fg"><label>তারিখ</label><input class="fi" id="oDt" type="date" value="'+esc(o.date)+'"></div><div class="fg"><label>অর্ডার আইডি</label><input class="fi" id="oId" value="'+esc(o.orderId)+'" placeholder="অটো"></div></div>'+
+  '<div class="fg"><label>স্ট্যাটাস</label><select class="fs" id="oSs">'+ST.map(s=>'<option value="'+s+'"'+(o.status===s?' selected':'')+'>'+SL[s]+'</option>').join('')+'</select></div>'+
+  '<div class="fg"><label>কাস্টমারের জন্য নোট</label><textarea class="ft" id="oNt" placeholder="এই নোট কাস্টমার তার ট্র্যাকিং পেজে দেখতে পাবে">'+esc(o.note)+'</textarea></div>',
+  '<button class="btn btn-g" onclick="closeM()">বাতিল</button><button class="btn btn-p" id="osv" onclick="ordSave(\''+(id||'')+'\')"><i class="fa-solid fa-floppy-disk"></i> সেভ</button>');
+}
+function ordSave(id){run($('osv'),async()=>{
+  await api('/admin/track/order','POST',{id,customerId:$('oCu').value,service:$('oSv').value,link:$('oLk').value,quantity:$('oQt').value,startCount:$('oSt').value,remains:$('oRm').value,charge:$('oCh').value,date:$('oDt').value,orderId:$('oId').value,status:$('oSs').value,note:$('oNt').value});
+  closeM();toast('সেভ হয়েছে');await refresh()})}
+function csv(){
+  const a=filtered(),q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const rows=[['Order ID','Customer','Service','Link','Quantity','Start','Remains','Charge','Date','Status','Note']].concat(a.map(o=>[o.orderId,o.customerName,o.service,o.link,o.quantity,o.startCount,o.remains,o.charge,o.date,o.status,o.note]));
+  const b=new Blob(['﻿'+rows.map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv;charset=utf-8'});const u=URL.createObjectURL(b),l=document.createElement('a');l.href=u;l.download='orders-'+new Date().toISOString().slice(0,10)+'.csv';l.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+
+/* ---------- settings ---------- */
+function pSet(){
+  const s=D.settings;
+  $('page').innerHTML=head('সেটিংস','ট্র্যাকিং পেজের তথ্য ও যোগাযোগ')+
+  '<div class="card" style="max-width:720px"><div class="card-h"><i class="fa-solid fa-gear"></i> ট্র্যাকিং সাইট সেটিংস</div><div class="card-b">'+
+  '<div class="fg"><label>সাইটের নাম</label><input class="fi" id="sN" value="'+esc(s.siteName)+'"></div>'+
+  '<div class="fg"><label>ট্র্যাকিং পেজের বেস URL</label><input class="fi" id="sB" value="'+esc(s.baseUrl)+'" placeholder="'+esc(location.origin+'/track')+'"><small>খালি রাখলে ডিফল্ট ব্যবহার হবে: '+esc(location.origin+'/track')+' — লিংক হবে <b>…/track?key=XXXX</b></small></div>'+
+  '<div class="row2"><div class="fg"><label>সাপোর্ট ইমেইল</label><input class="fi" id="sE" value="'+esc(s.email)+'"></div><div class="fg"><label>সাপোর্ট ফোন</label><input class="fi" id="sP" value="'+esc(s.phone)+'"></div></div>'+
+  '<div class="fg"><label>WhatsApp নম্বর (দেশের কোডসহ)</label><input class="fi" id="sW" value="'+esc(s.whatsapp)+'" placeholder="8801XXXXXXXXX"></div>'+
+  '<div class="fg"><label>নোটিশ (সব কাস্টমারের পেজের উপরে দেখাবে)</label><textarea class="ft" id="sNt">'+esc(s.notice)+'</textarea></div>'+
+  '<button class="btn btn-p" id="ssv" onclick="setSave()"><i class="fa-solid fa-floppy-disk"></i> সেভ করুন</button></div></div>'+
+  '<div class="card" style="max-width:720px"><div class="card-h"><i class="fa-solid fa-key"></i> পাসওয়ার্ড</div><div class="card-b" style="font-weight:600;color:var(--muted)">এই প্যানেলের পাসওয়ার্ড মূল অ্যাডমিন প্যানেলের সাথে একই (Vercel Environment Variable: <b style="color:var(--text)">ADMIN_PASSWORD</b>)। পাসওয়ার্ড বদলাতে Vercel → Settings → Environment Variables এ পরিবর্তন করে Redeploy করুন; দুই প্যানেলেই নতুন পাসওয়ার্ড কাজ করবে।</div></div>';
+}
+function setSave(){run($('ssv'),async()=>{await api('/admin/track/settings','POST',{siteName:$('sN').value,baseUrl:$('sB').value,email:$('sE').value,phone:$('sP').value,whatsapp:$('sW').value,notice:$('sNt').value});toast('সেটিংস সেভ হয়েছে');await refresh()})}
+
+if(TOKEN)start();
+</script>
+</body>
+</html>
